@@ -321,38 +321,10 @@ public class MainMap extends TileView{
 	}
 	  
 	private void addShape() {
-		//myShape = new ShapeT();
 		//TODO add some shape
 		putTetrinoOnMap(5, 2);
-		//Log.d(TAG, "shape created");
-		//setTile(BLOCK_GREY, 2,2);
+		
 	}
-
-//	    private void updateShape()
-//	    {
-//	    	if (myShape != null) {
-//	    		Vector<Coordinate> toRemove = new Vector<Coordinate>();
-//	    		for (Coordinate aCoord: mAppleList) {
-//	    			for(Coordinate c : myShape.getCoordinate()) {
-//	    				if (aCoord.equals(c)) {
-//	    					//mAppleList.remove(c);
-//	    					toRemove.add(c);
-//	    				}
-//	    			}
-//	    		}
-//	    		mAppleList.removeAll(toRemove);
-//
-//	    		myShape.dropDown();
-//
-//	    		for(Coordinate c : myShape.getCoordinate()) {
-//	    			mAppleList.add(c);
-//	    		}
-//	    		Log.d(TAG, "List Size" + mAppleList.size());
-//	    		for (Coordinate c : mAppleList) {
-//	    			setTile(YELLOW_STAR, c.getX(), c.getY());
-//	    		}
-//	    	}
-//	    }
 
 	/**
 	 * Handles the basic update loop, checking to see if we are in the running
