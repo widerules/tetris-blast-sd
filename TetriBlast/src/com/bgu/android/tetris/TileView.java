@@ -20,8 +20,8 @@ public class TileView extends View {
 
     protected static int mTileSize;
 
-    protected static final int mXTileCount = 10;
-    protected static final int mYTileCount = 20;
+    protected static final int mXTileCount = 12;
+    protected static final int mYTileCount = 22;
 
     private static int mXOffset;
     private static int mYOffset;
