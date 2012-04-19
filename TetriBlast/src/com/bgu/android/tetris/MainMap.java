@@ -16,6 +16,7 @@ public class MainMap extends TileView{
 	/**
 	 * Labels for the drawables that will be loaded into the TileView class
 	 */
+	private static final int BLOCK_EMPTY = 0;
 	private static final int BLOCK_RED = 1;
 	private static final int BLOCK_BLUE = 2;
 	private static final int BLOCK_GREEN = 3;
@@ -29,6 +30,8 @@ public class MainMap extends TileView{
 	private static final int BLOCK_BG1 = 11;
 	private static final int BLOCK_BG2 = 12;
 	private static final int NUM_OF_TILES = 12;
+	private static final int MAP_X_SIZE = 10;
+	private static final int MAP_Y_SIZE = 20;
 
 	/**
 	 * mSnakeTrail: a list of Coordinates that make up the snake's body
@@ -48,6 +51,12 @@ public class MainMap extends TileView{
 	private boolean isReady = false;
 	
 	private int[][] tetrino = new int[3][3];
+	private int tetrinoXpos;
+	private int tetrinoYpos;
+	private boolean noShape;
+	//two dimensional array hold the main tetris map 
+	private int[][] map = new int[MAP_X_SIZE][MAP_Y_SIZE];
+	//private int[][] mapOld;
 	    
 //	    /**
 //	     * 
@@ -130,13 +139,15 @@ public class MainMap extends TileView{
 		tetrino[2][0] = 0;
 		tetrino[2][1] = 0;
 		tetrino[2][2] = 0;
+		resetMap();
+		noShape = true;
 		update();
 	}
 	
 	private void putTetrinoOnMap(int x, int y) {
 		for(int col = 0; col < 3; col++){
 			for(int row = 0; row < 3; row++) {
-				setTile(tetrino[col][row], x+row, y+col);
+				map[x+col][y+row] = tetrino[col][row];
 			}
 		}
 		
@@ -320,10 +331,20 @@ public class MainMap extends TileView{
 		return true;
 	}
 	  
-	private void addShape() {
-		//TODO add some shape
-		putTetrinoOnMap(5, 2);
-		
+	private void moveShape() {
+		if (noShape) {
+			tetrinoXpos = 5;
+			tetrinoYpos = 0;
+			noShape = false;
+			//tetrino = new Tetrino();
+		}
+		//tetrino.setYpos(tetrino.getYpos()++);
+		//putTetrinoOnMap(tetrino.getXpos(), tetrino.getYpos());
+		putTetrinoOnMap(tetrinoXpos, tetrinoYpos);
+		tetrinoYpos++;
+		if(tetrinoYpos == 17){
+			noShape = true;
+		}
 	}
 
 	/**
@@ -334,12 +355,31 @@ public class MainMap extends TileView{
 		if(isReady) {
 			clearTiles();
 			updateWalls();
-			addShape();
-			rotateTetrino();
+			updateMap();
+			resetMap();
+			moveShape();
+			//rotateTetrino();
 		}
 		mRedrawHandler.sleep(mMoveDelay);	
 	}
 		
+	private void resetMap() {
+		for(int col = 0; col < MAP_X_SIZE; col+=2){
+			for(int row = 0; row < MAP_Y_SIZE; row++) {
+				map[col+row%2][row] = BLOCK_EMPTY;
+				map[col+1-row%2][row] = BLOCK_EMPTY;
+			}
+		}
+	}
+	
+	private void updateMap() {
+		for(int col = 0; col < MAP_X_SIZE; col++){
+			for(int row = 0; row < MAP_Y_SIZE; row++) {
+				setTile(map[col][row], 1+col, 1+row);
+			}
+		}
+		
+	}
 
 	/**
 	 * Draws some walls.
