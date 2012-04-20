@@ -12,7 +12,15 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 public class MainMap extends TileView{
+	public static final int	L_TYPE = 0;
+	public static final int J_TYPE = 1;
+	public static final int	T_TYPE = 2;
+	public static final int	Z_TYPE = 3;
+	public static final int	S_TYPE = 4;
+	public static final int	O_TYPE = 5;
+	public static final int	I_TYPE = 6;
 	
+	public int tempCount;
 	/**
 	 * mSnakeTrail: a list of Coordinates that make up the snake's body
 	 * mAppleList: the secret location of the juicy apples the snake craves.
@@ -114,9 +122,31 @@ public class MainMap extends TileView{
 		Log.d(TAG, "game init");
 		mMoveDelay = 500;//delay [ms]
 		myMap.resetMap();
-		tetr = new Tetrino(5,0);
 		noShape = true;
+		tempCount = 0;
 		update();
+	}
+	
+	private Tetrino newTetrino(int type, int x, int y) {
+		switch(type){
+		case L_TYPE:
+			return new LTetrino(x, y);
+		case J_TYPE:
+			return new JTetrino(x, y);
+		case T_TYPE:
+			return new TTetrino(x, y);
+		case Z_TYPE:
+			return new ZTetrino(x, y);
+		case S_TYPE:
+			return new STetrino(x, y);
+		case O_TYPE:
+			return new OTetrino(x, y);
+		case I_TYPE:
+			return new ITetrino(x, y);
+		default:
+			return new LTetrino(x, y);
+				
+		}
 	}
 	
 	/**
@@ -291,13 +321,15 @@ public class MainMap extends TileView{
 			//tetrinoXpos = 5;
 			//tetrinoYpos = 0;
 			noShape = false;
-			tetr = new Tetrino(5, 0);
+			tetr = newTetrino(I_TYPE, 5, 0);
+			tempCount++;
 			//tetr.setPos(5, 0);
 		}
 		//tetrino.setYpos(tetrino.getYpos()++);
 		//putTetrinoOnMap(tetrino.getXpos(), tetrino.getYpos());
 		myMap.putTetrinoOnMap(tetr);
 		tetr.setPos(tetr.getXPos(), tetr.getYPos()+1);
+		tetr.rotateTetrino();
 		if(tetr.getYPos() == 18){
 			noShape = true;
 		}
