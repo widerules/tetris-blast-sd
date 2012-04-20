@@ -12,6 +12,24 @@ import android.view.View;
 
 public class TileView extends View {
 	public static final String TAG = "TetrisBlast";
+	
+	/**
+	 * Labels for the drawables that will be loaded into the TileView class
+	 */
+	protected static final int BLOCK_EMPTY = 0;
+	protected static final int BLOCK_RED = 1;
+	protected static final int BLOCK_BLUE = 2;
+	protected static final int BLOCK_GREEN = 3;
+	protected static final int BLOCK_YELLOW = 4;
+	protected static final int BLOCK_PINK = 5;
+	protected static final int BLOCK_LIGHBLUE = 6;
+	protected static final int BLOCK_ORANGE = 7;
+	protected static final int BLOCK_GREY = 8;
+	protected static final int BLOCK_GHOST = 9;
+	protected static final int BLOCK_BLOCK = 10;
+	protected static final int BLOCK_BG1 = 11;
+	protected static final int BLOCK_BG2 = 12;
+	protected static final int NUM_OF_TILES = 12;
     /**
      * Parameters controlling the size of the tiles and their range within view.
      * Width/Height are in pixels, and Drawables will be scaled to fit to these
