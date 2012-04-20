@@ -12,27 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 public class MainMap extends TileView{
-	    
-	/**
-	 * Labels for the drawables that will be loaded into the TileView class
-	 */
-	private static final int BLOCK_EMPTY = 0;
-	private static final int BLOCK_RED = 1;
-	private static final int BLOCK_BLUE = 2;
-	private static final int BLOCK_GREEN = 3;
-	private static final int BLOCK_YELLOW = 4;
-	private static final int BLOCK_PINK = 5;
-	private static final int BLOCK_LIGHBLUE = 6;
-	private static final int BLOCK_ORANGE = 7;
-	private static final int BLOCK_GREY = 8;
-	private static final int BLOCK_GHOST = 9;
-	private static final int BLOCK_BLOCK = 10;
-	private static final int BLOCK_BG1 = 11;
-	private static final int BLOCK_BG2 = 12;
-	private static final int NUM_OF_TILES = 12;
-	private static final int MAP_X_SIZE = 10;
-	private static final int MAP_Y_SIZE = 20;
-
+	
 	/**
 	 * mSnakeTrail: a list of Coordinates that make up the snake's body
 	 * mAppleList: the secret location of the juicy apples the snake craves.
@@ -50,12 +30,15 @@ public class MainMap extends TileView{
 	private long mMoveDelay;
 	private boolean isReady = false;
 	
-	private int[][] tetrino = new int[3][3];
-	private int tetrinoXpos;
-	private int tetrinoYpos;
+	private Tetrino tetr;// = new Tetrino();
+	//private int[][] tetrino = new int[3][3];
+	//private int tetrinoXpos;
+	//private int tetrinoYpos;
 	private boolean noShape;
+	
 	//two dimensional array hold the main tetris map 
-	private int[][] map = new int[MAP_X_SIZE][MAP_Y_SIZE];
+	private TetrinoMap myMap = new TetrinoMap();
+	//private int[][] map = new int[MAP_X_SIZE][MAP_Y_SIZE];
 	//private int[][] mapOld;
 	    
 //	    /**
@@ -130,40 +113,12 @@ public class MainMap extends TileView{
 		mTileList.clear();
 		Log.d(TAG, "game init");
 		mMoveDelay = 500;//delay [ms]
-		tetrino[0][0] = BLOCK_PINK;
-		tetrino[0][1] = BLOCK_PINK;
-		tetrino[0][2] = 0;
-		tetrino[1][0] = 0;
-		tetrino[1][1] = BLOCK_PINK;
-		tetrino[1][2] = BLOCK_PINK;
-		tetrino[2][0] = 0;
-		tetrino[2][1] = 0;
-		tetrino[2][2] = 0;
-		resetMap();
+		myMap.resetMap();
+		tetr = new Tetrino(5,0);
 		noShape = true;
 		update();
 	}
 	
-	private void putTetrinoOnMap(int x, int y) {
-		for(int col = 0; col < 3; col++){
-			for(int row = 0; row < 3; row++) {
-				map[x+col][y+row] = tetrino[col][row];
-			}
-		}
-		
-	}
-	
-	private void rotateTetrino() {
-		int[][] temp = new int[3][3];
-		for(int col = 0; col < 3; col++){
-			for(int row = 0; row < 3; row++) {
-				temp[col][row] = tetrino[row][2-col];
-			}
-		}
-		tetrino = temp;
-	}
-
-
 	/**
 	 * Given a ArrayList of coordinates, we need to flatten them into an array of
 	 * ints before we can stuff them into a map for flattening and storage.
@@ -333,16 +288,17 @@ public class MainMap extends TileView{
 	  
 	private void moveShape() {
 		if (noShape) {
-			tetrinoXpos = 5;
-			tetrinoYpos = 0;
+			//tetrinoXpos = 5;
+			//tetrinoYpos = 0;
 			noShape = false;
-			//tetrino = new Tetrino();
+			tetr = new Tetrino(5, 0);
+			//tetr.setPos(5, 0);
 		}
 		//tetrino.setYpos(tetrino.getYpos()++);
 		//putTetrinoOnMap(tetrino.getXpos(), tetrino.getYpos());
-		putTetrinoOnMap(tetrinoXpos, tetrinoYpos);
-		tetrinoYpos++;
-		if(tetrinoYpos == 17){
+		myMap.putTetrinoOnMap(tetr);
+		tetr.setPos(tetr.getXPos(), tetr.getYPos()+1);
+		if(tetr.getYPos() == 18){
 			noShape = true;
 		}
 	}
@@ -356,26 +312,26 @@ public class MainMap extends TileView{
 			clearTiles();
 			updateWalls();
 			updateMap();
-			resetMap();
-			moveShape();
+			myMap.resetMap();
+			moveShape();//TODO insert this function to the Tetrino
 			//rotateTetrino();
 		}
 		mRedrawHandler.sleep(mMoveDelay);	
 	}
 		
-	private void resetMap() {
-		for(int col = 0; col < MAP_X_SIZE; col+=2){
-			for(int row = 0; row < MAP_Y_SIZE; row++) {
-				map[col+row%2][row] = BLOCK_EMPTY;
-				map[col+1-row%2][row] = BLOCK_EMPTY;
-			}
-		}
-	}
+//	private void resetMap() {
+//		for(int col = 0; col < MAP_X_SIZE; col+=2){
+//			for(int row = 0; row < MAP_Y_SIZE; row++) {
+//				map[col+row%2][row] = BLOCK_EMPTY;
+//				map[col+1-row%2][row] = BLOCK_EMPTY;
+//			}
+//		}
+//	}
 	
 	private void updateMap() {
-		for(int col = 0; col < MAP_X_SIZE; col++){
-			for(int row = 0; row < MAP_Y_SIZE; row++) {
-				setTile(map[col][row], 1+col, 1+row);
+		for(int col = 0; col < TetrinoMap.MAP_X_SIZE; col++){
+			for(int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
+				setTile(myMap.getMapValue(col, row), 1+col, 1+row);
 			}
 		}
 		
