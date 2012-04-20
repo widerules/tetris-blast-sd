@@ -2,7 +2,7 @@ package com.bgu.android.tetris;
 
 import android.graphics.Point;
 
-public class Tetrino {
+public abstract class Tetrino {
 	public static final int SIZE = 3;
 	public int[][] sMap;
 	private Point pos;
@@ -14,22 +14,9 @@ public class Tetrino {
 				sMap[col][row] = 0;
 			}
 		}
-		fillMap();
 		pos = new Point(x,y);
 	}
 	
-	//TODO remove this
-	private void fillMap(){
-		sMap[0][0] = TileView.BLOCK_PINK;
-		sMap[0][1] = TileView.BLOCK_PINK;
-		sMap[0][2] = 0;
-		sMap[1][0] = 0;
-		sMap[1][1] = TileView.BLOCK_PINK;
-		sMap[1][2] = TileView.BLOCK_PINK;
-		sMap[2][0] = 0;
-		sMap[2][1] = 0;
-		sMap[2][2] = 0;
-	}
 	
 	//TODO need to check
 	public void rotateTetrino() {
