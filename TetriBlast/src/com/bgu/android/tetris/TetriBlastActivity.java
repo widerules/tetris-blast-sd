@@ -3,6 +3,7 @@ package com.bgu.android.tetris;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 public class TetriBlastActivity extends Activity {
     
@@ -19,7 +20,7 @@ public class TetriBlastActivity extends Activity {
         Log.d(TAG, "Create main layout");
         mMainMapView = (MainMap) findViewById(R.id.tetris);
         mMainMapView.initNewGame();
-        //TextView myText = (TextView) findViewById(R.id.text_info);
+        //TextView myText = (TextView) findViewById(R.id.txt);
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
             //mSnakeView.setMode(TetrisView.READY);

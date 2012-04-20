@@ -321,7 +321,7 @@ public class MainMap extends TileView{
 			//tetrinoXpos = 5;
 			//tetrinoYpos = 0;
 			noShape = false;
-			tetr = newTetrino(I_TYPE, 5, 0);
+			tetr = newTetrino(tempCount%7, 5, 0);
 			tempCount++;
 			//tetr.setPos(5, 0);
 		}
