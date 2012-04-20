@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 public class TileView extends View {
 	public static final String TAG = "TetrisBlast";
@@ -59,12 +60,16 @@ public class TileView extends View {
 
     private final Paint mPaint = new Paint();
 
+    public TextView myText;
     //Constructors
     public TileView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         Log.d(TAG, "TileView constructor 1");
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
+        myText = (TextView) findViewById(R.id.txt);
         mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
+        Log.d(TAG, "In constructor1: The tile size = " + Integer.toString(mTileSize));
+        //myText.setText("In constructor1: The tile size = " + Integer.toString(mTileSize));
         a.recycle();
     }
 
@@ -72,7 +77,10 @@ public class TileView extends View {
         super(context, attrs);
         Log.d(TAG, "TileView constructor 2");
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
+        myText = (TextView) findViewById(R.id.txt);
         mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
+        Log.d(TAG, "In constructor2: The tile size = " + Integer.toString(mTileSize));
+        //myText.setText("In constructor2: The tile size = " + Integer.toString(mTileSize));
         a.recycle();
     }
 
@@ -93,6 +101,11 @@ public class TileView extends View {
         //mXTileCount = (int) Math.floor(w / mTileSize);
         //mYTileCount = (int) Math.floor(h / mTileSize);
     	Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
+    	if(w == 800) {
+    		mTileSize = 18;
+    	}
+    	Log.d(TAG, "The tile size changed to = " + Integer.toString(mTileSize));
+    	//resetTiles(20);//TODO check this
         mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
         mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
 
