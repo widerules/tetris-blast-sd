@@ -5,6 +5,7 @@ import android.graphics.Point;
 public abstract class Tetrino {
 	public static final int SIZE = 3;
 	public int[][] sMap;
+	//public int[][] shadowMap;
 	private Point pos;
 	
 	public Tetrino(int x, int y) {
@@ -12,6 +13,7 @@ public abstract class Tetrino {
 		for(int col = 0; col < SIZE; col++) {
 			for(int row = 0; row < SIZE; row++) {
 				sMap[col][row] = 0;
+				//shadowMap[0][0] = 0;
 			}
 		}
 		pos = new Point(x,y);
@@ -40,7 +42,8 @@ public abstract class Tetrino {
 	 * @param pos the pos to set
 	 */
 	public void setPos(int x, int y) {
-		this.pos.x = x;
+		if(x >= 0 && x < 8)
+			this.pos.x = x;
 		this.pos.y = y;
 	}
 	
