@@ -38,26 +38,13 @@ public class MainMap extends TileView{
 	private long mMoveDelay;
 	private boolean isReady = false;
 	
-	private Tetrino tetr;// = new Tetrino();
-	//private int[][] tetrino = new int[3][3];
-	//private int tetrinoXpos;
-	//private int tetrinoYpos;
+	private Tetrino tetr;
 	private boolean noShape;
 	
 	//two dimensional array hold the main tetris map 
-	private TetrinoMap myMap = new TetrinoMap();
-	//private int[][] map = new int[MAP_X_SIZE][MAP_Y_SIZE];
-	//private int[][] mapOld;
-	    
-//	    /**
-//	     * 
-//	     * @author Denis
-//	     * Coordinates For the touch recognition
-//	     */
-//	    private float initialX = 0;
-//		private float initialY = 0;
-//		private float deltaX = 0;
-//		private float deltaY = 0;
+	private TetrinoMap mapCur = new TetrinoMap();
+	private TetrinoMap mapOld = new TetrinoMap();
+	private TetrinoMap mapLast = new TetrinoMap();
 	    
 	class RefreshHandler extends Handler {
 
@@ -100,7 +87,7 @@ public class MainMap extends TileView{
 	private void initMainMap() {
 		setFocusable(true);
 		Resources r = this.getContext().getResources();
-		resetTiles(NUM_OF_TILES+10);
+		resetTiles(NUM_OF_TILES+10);//TODO fix this
 		loadTile(BLOCK_RED, r.getDrawable(R.drawable.block_red));
 		loadTile(BLOCK_BLUE, r.getDrawable(R.drawable.block_blue));
 		loadTile(BLOCK_GREEN, r.getDrawable(R.drawable.block_green));
@@ -121,10 +108,12 @@ public class MainMap extends TileView{
 		mTileList.clear();
 		Log.d(TAG, "game init");
 		mMoveDelay = 500;//delay [ms]
-		myMap.resetMap();
+		mapCur.resetMap();
+		mapOld.resetMap();
+		mapLast.resetMap();
 		noShape = true;
 		tempCount = 0;
-		update();
+		mRedrawHandler.sleep(mMoveDelay);
 	}
 	
 	private Tetrino newTetrino(int type, int x, int y) {
@@ -323,16 +312,21 @@ public class MainMap extends TileView{
 			noShape = false;
 			tetr = newTetrino(tempCount%7, 5, 0);
 			tempCount++;
+			//mapOld.copyFrom(myMap);
 			//tetr.setPos(5, 0);
+		
 		}
-		//tetrino.setYpos(tetrino.getYpos()++);
-		//putTetrinoOnMap(tetrino.getXpos(), tetrino.getYpos());
-		myMap.putTetrinoOnMap(tetr);
-		tetr.setPos(tetr.getXPos(), tetr.getYPos()+1);
-		tetr.rotateTetrino();
-		if(tetr.getYPos() == 18){
+		if(!mapCur.putTetrinoOnMap(tetr)) {
 			noShape = true;
+			mapOld.copyFrom(mapLast);
+			update();
+			this.invalidate();
 		}
+		else
+			tetr.setPos(tetr.getXPos(), tetr.getYPos()+1);
+						
+		
+		//tetr.rotateTetrino();
 	}
 
 	/**
@@ -343,27 +337,20 @@ public class MainMap extends TileView{
 		if(isReady) {
 			clearTiles();
 			updateWalls();
-			updateMap();
-			myMap.resetMap();
 			moveShape();//TODO insert this function to the Tetrino
-			//rotateTetrino();
+			updateMap();
+			mapCur.resetMap();
+			mapCur.copyFrom(mapOld);
+			
 		}
 		mRedrawHandler.sleep(mMoveDelay);	
 	}
 		
-//	private void resetMap() {
-//		for(int col = 0; col < MAP_X_SIZE; col+=2){
-//			for(int row = 0; row < MAP_Y_SIZE; row++) {
-//				map[col+row%2][row] = BLOCK_EMPTY;
-//				map[col+1-row%2][row] = BLOCK_EMPTY;
-//			}
-//		}
-//	}
-	
 	private void updateMap() {
+		mapLast.copyFrom(mapCur);
 		for(int col = 0; col < TetrinoMap.MAP_X_SIZE; col++){
 			for(int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
-				setTile(myMap.getMapValue(col, row), 1+col, 1+row);
+				setTile(mapCur.getMapValue(col, row), 1+col, 1+row);
 			}
 		}
 		
