@@ -17,8 +17,8 @@ public class OTetrino extends Tetrino {
 	}
 	
 	@Override
-	public void rotateTetrino() {
-		
+	public boolean rotateTetrino(TetrinoMap map) {
+		return false;
 	}
 	
 

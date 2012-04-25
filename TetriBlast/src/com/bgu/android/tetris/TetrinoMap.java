@@ -31,17 +31,16 @@ public class TetrinoMap {
 	 * @return true if puts successful otherwise false
 	 */
 	public boolean putTetrinoOnMap(Tetrino shape) {
-		for(int col = 0; col < shape.getSize(); col++){
-			for(int row = 0; row < shape.getSize(); row++) {
-			//TODO need to check map bounds collision detect
-				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
-					if (shape.getXPos() + col >= TetrinoMap.MAP_X_SIZE || 
-							shape.getYPos() + row >= TetrinoMap.MAP_Y_SIZE ||
-							map[shape.getXPos()+col][shape.getYPos()+row] != TileView.BLOCK_EMPTY)
-						return false;
-				}
-			}
-		}
+//		for(int col = 0; col < shape.getSize(); col++){
+//			for(int row = 0; row < shape.getSize(); row++) {
+//				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
+//					if (shape.getXPos() + col >= TetrinoMap.MAP_X_SIZE || 
+//							shape.getYPos() + row >= TetrinoMap.MAP_Y_SIZE ||
+//							map[shape.getXPos()+col][shape.getYPos()+row] != TileView.BLOCK_EMPTY)
+//						return false;
+//				}
+//			}
+//		}
 		for(int col = 0; col < shape.getSize(); col++){
 			for(int row = 0; row < shape.getSize(); row++) {
 				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) 

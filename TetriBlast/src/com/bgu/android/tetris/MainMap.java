@@ -1,6 +1,8 @@
 package com.bgu.android.tetris;
 
 import java.util.ArrayList;
+
+import android.R.bool;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -48,7 +50,10 @@ public class MainMap extends TileView{
 	   
 	private int xRaw = 0;
 	private int xRotate = 0;
-	private static final int sensativity = 15;
+	private int xInitPos = 0;
+	private static final int sensativity = 10;
+	private boolean onMove = false;
+	
 	class RefreshHandler extends Handler {
 
 		@Override
@@ -219,164 +224,101 @@ public class MainMap extends TileView{
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-					//This prevents touchscreen events from flooding the main thread
-					synchronized (event)
-					{
-						try
-						{
-							//Waits 16ms.
-							event.wait(16);
-							
-							//when user touches the screen
-							if(event.getAction() == MotionEvent.ACTION_DOWN)
-							{
-								//reset deltaX and deltaY
-								//deltaX = deltaY = 0;
-		
-								//get initial positions
-								xRaw = (int) Math.floor(event.getRawX());
-								if (xRaw > mXOffset+mTileSize && xRaw < mXOffset+(mTileSize-1)*mXTileCount){
-									xRotate = xRaw;
-								}
-							}
-							
-							if(event.getAction() == MotionEvent.ACTION_MOVE) {
-								float curentX = event.getRawX();
-								if((int)Math.abs(xRaw - (int)curentX) > sensativity ) {
-									xRaw = (int) Math.floor(event.getRawX());
-									if (xRaw > mXOffset+mTileSize && xRaw < mXOffset+(mTileSize-1)*mXTileCount){
-										//Log.d(TAG, "ACTION_MOVE xRaw = " + Integer.toString(xRaw));
-										int xPos = (int)Math.floor((xRaw - (mXOffset+mTileSize))/mTileSize);
-										//Log.d(TAG, "ACTION_MOVE xPos = " + Integer.toString(xPos));
-										tetr.setPos(xPos, tetr.getYPos());
-										mapCur.resetMap();
-										mapCur.copyFrom(mapOld);
-										if(!mapCur.putTetrinoOnMap(tetr)) {
-											mapCur.copyFrom(mapLast);
-											//mapOld.copyFrom(mapLast);
-										}
-										//mapCur.putTetrinoOnMap(tetr);
-										update();
-									}
-								}
-								//float xHistRaw = event.getHistoricalX(0);
-								//Log.d(TAG, "ACTION_MOVE xRaw = " + Float.toString(xRaw));
-								//Log.d(TAG, "ACTION_MOVE historX = " + Float.toString(xHistRaw));
-								
-							}
-							
-		
-							//when screen is released
-							if(event.getAction() == MotionEvent.ACTION_UP)
-							{
-								int xUpRotate = (int) Math.floor(event.getRawX());
-								if(xUpRotate  == xRotate) {
-									tetr.rotateTetrino();
-									mapCur.resetMap();
-									mapCur.copyFrom(mapOld);
-									if(!mapCur.putTetrinoOnMap(tetr)) {
-										mapCur.copyFrom(mapLast);
-									}
-									update();
-								}
-									
-								
-							}
-//								deltaX = event.getRawX() - initialX;
-//								deltaY = event.getRawY() - initialY;
-//		
-//								if(Math.abs(deltaX) >= Math.abs(deltaY))
-//								{
-//									if(deltaX < 0)
-//									{
-//										//make your object/character move left
-//										myShape.moveLeft();
-//										if (mDirection != EAST) {
-//							                mNextDirection = WEST;
-//							            }
-//							            return (true);
-//									}
-//									else
-//									{
-//										//make your object/character move right
-//										myShape.moveRight();
-//										if (mDirection != WEST) {
-//							                mNextDirection = EAST;
-//							            }
-//							            return (true);
-//									}
-//								}
-//								else
-//								{
-//									if(deltaY < 0)
-//									{
-//										//make your object/character move up
-//										if (mMode == READY | mMode == LOSE) {
-//							                /*
-//							                 * At the beginning of the game, or the end of a previous one,
-//							                 * we should start a new game.
-//							                 */
-//							                initNewGame();
-//							                setMode(RUNNING);
-//							                update();
-//							                return (true);
-//							            }
-//		
-//							            if (mMode == PAUSE) {
-//							                /*
-//							                 * If the game is merely paused, we should just continue where
-//							                 * we left off.
-//							                 */
-//							                setMode(RUNNING);
-//							                update();
-//							                return (true);
-//							            }
-//							            if (mMode == RUNNING) {
-//							                if(myShape instanceof ShapeT)
-//							                	((ShapeT)myShape).rotate();
-//							            }
-//							            return (true);
-//									}
-//									else
-//									{
-//										
-//										if (mDirection != NORTH) {
-//							                mNextDirection = SOUTH;
-//							            }
-//							            return (true);
-//							            //make your object/character move down							
-//									}
-//								}
-//							
-//							}
+		//This prevents touchscreen events from flooding the main thread
+		synchronized (event)
+		{
+			try
+			{
+				//Waits 16ms.
+				event.wait(16);
+
+				//when user touches the screen
+				if(event.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					xRaw = (int) Math.floor(event.getRawX());
+					if (xRaw > mXOffset+mTileSize && xRaw < mXOffset+(mTileSize-1)*mXTileCount){
+						xRotate = xRaw;
+						xInitPos  =  (int)Math.floor((xRaw - (mXOffset))/mTileSize);
+						if (xInitPos >= tetr.getXPos() && xInitPos <= tetr.getXPos() + 3)
+							onMove = true;
+					}
+					
+					
+				}
+
+				if(event.getAction() == MotionEvent.ACTION_MOVE) {
+					int xCurRow = (int) Math.floor(event.getRawX());
+					int xCurPos = (int)Math.floor((xCurRow-mXOffset)/(mTileSize));
+					if (onMove){
+						
+						if (tetr.getXPos() > xCurPos) {
+							mapCur.resetMap();
+							mapCur.copyFrom(mapOld);
+							if(tetr.moveLeft(mapCur))
+								mapCur.putTetrinoOnMap(tetr);
+							else
+								mapCur.copyFrom(mapLast);
+							update();
 						}
-		
-						catch (InterruptedException e)
-						{
-							return true;
+						else if(tetr.getXPos() + 2 < xCurPos) {
+							mapCur.resetMap();
+							mapCur.copyFrom(mapOld);
+							if(tetr.moveRight(mapCur))
+								mapCur.putTetrinoOnMap(tetr);
+							else
+								mapCur.copyFrom(mapLast);
+							update();
+						}
+						
 						}
 					}
+					
+				//when screen is released
+				if(event.getAction() == MotionEvent.ACTION_UP)
+				{
+					onMove = false;
+					int xUpRotate = (int) Math.floor(event.getRawX());
+					if(xUpRotate  == xRotate) {
+						mapCur.resetMap();
+						mapCur.copyFrom(mapOld);
+						if(tetr.rotateTetrino(mapCur))
+							mapCur.putTetrinoOnMap(tetr);
+						else
+							mapCur.copyFrom(mapLast);
+						update();
+					}
+
+
+				}
+
+			}
+
+			catch (InterruptedException e)
+			{
+				return true;
+			}
+		}
 		return true;
 	}
 	  
 	private void moveShape() {
 		if (noShape) {
 			noShape = false;
-			tetr = newTetrino(tempCount%7, 5, 0);
+			tetr = newTetrino(tempCount%7, 5, 0);//TODO check this
 			tempCount++;
 			mapCur.putTetrinoOnMap(tetr);
 		}
 		else
 		{
-			tetr.setPos(tetr.getXPos(), tetr.getYPos()+1);
-			if(!mapCur.putTetrinoOnMap(tetr)) {
+			if(tetr.moveDown(mapCur)){
+				mapCur.putTetrinoOnMap(tetr);
+			}
+			else {
 				noShape = true;
 				mapCur.copyFrom(mapLast);
 				mapOld.copyFrom(mapLast);
 			}
 		}
-	
-		//tetr.rotateTetrino();
 	}
 
 	/**

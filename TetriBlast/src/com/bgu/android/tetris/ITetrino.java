@@ -31,14 +31,18 @@ public class ITetrino extends Tetrino {
 	}
 	
 	@Override
-	public void rotateTetrino() {
+	public boolean rotateTetrino(TetrinoMap map) {
 		int[][] temp = new int[I_SIZE][I_SIZE];
 		for(int col = 0; col < I_SIZE; col++){
 			for(int row = 0; row < I_SIZE; row++) {
 				temp[col][row] = sMap[row][3-col];
 			}
 		}
-		sMap = temp;
+		if(!isColusionX(getXPos(), map) && !isColusionY(getYPos(), map)) {
+			sMap = temp;
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
