@@ -130,6 +130,17 @@ public abstract class Tetrino {
 		return false;
 	}
 	
+	public boolean drop(TetrinoMap map) {
+		//int setY = this.pos.y;
+		for (int y = 1; y < 20; y++) {//TODO change to defined values
+			if(isColusionY(y, map)) {
+				this.pos.y = y-1;
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * @return the x position
 	 */
