@@ -332,9 +332,12 @@ public class MainMap extends TileView{
 				mapCur.putTetrinoOnMap(tetr);
 			}
 			else {
+				
 				noShape = true;
 				mapCur.copyFrom(mapLast);
-				mapOld.copyFrom(mapLast);
+				int i = mapCur.lineCheckAndClear();
+				Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
+				mapOld.copyFrom(mapCur);
 			}
 		}
 	}

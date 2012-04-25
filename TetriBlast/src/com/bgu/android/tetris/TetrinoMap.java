@@ -63,4 +63,35 @@ public class TetrinoMap {
 		}
 		
 	}
+	/**
+	 * This function checks the filled lines and return number of cleared lines
+	 * @return number of cleared lines
+	 */
+	public int lineCheckAndClear() {
+		boolean isLine = true;
+		int lineCounter = 0;
+		for(int y = 0; y < 20; y++) {// TODO Auto-generated method stub
+			for(int x = 0; x < 10; x++){
+				if(map[x][y] == TileView.BLOCK_EMPTY)
+					isLine = false;
+			}
+			if(isLine) {
+				removeLine(y);
+				lineCounter++;
+			}
+			isLine = true;
+		}
+		return lineCounter;
+	}
+
+	private void removeLine(int row) {
+		for (int y = row; y > 0; y--) {// TODO Auto-generated method stub
+			for(int x = 0; x < 10; x++){
+				map[x][y] = map[x][y-1]; 
+			}
+		}
+		for (int x = 0; x < 10; x++) {
+			map[x][0] = TileView.BLOCK_EMPTY;
+		}
+	}
 }
