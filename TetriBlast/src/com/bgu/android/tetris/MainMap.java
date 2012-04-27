@@ -48,13 +48,12 @@ public class MainMap extends TileView{
 	private TetrinoMap mapOld = new TetrinoMap();
 	private TetrinoMap mapLast = new TetrinoMap();
 	   
-	//private int xRaw = 0;
-	//private int xRotate = 0;
-	private int xInitPos = 0;
-	private int yInitPos = 0;
-	private static final int sensativity = 10;
-	private boolean onMove = false;
-	private static final int dropSensativity = 4;
+	private boolean wasMoved;
+	private int xInitRaw;
+	private int yInitRaw;
+	private static final int xMoveSens = 30;
+	private static final int rotateSens = 10; 
+	private static final int dropSensativity = 100;//~30*3.5
 	
 	
 	class RefreshHandler extends Handler {
@@ -238,59 +237,42 @@ public class MainMap extends TileView{
 				//when user touches the screen
 				if(event.getAction() == MotionEvent.ACTION_DOWN)
 				{
-					int xRaw = (int) Math.floor(event.getRawX());
-					int yRaw = (int) Math.floor(event.getRawY());
-					yInitPos = (int)Math.floor((yRaw - (mYOffset))/mTileSize);
-					Log.d(TAG, "init pos set to = " + Integer.toString(yInitPos));
-					if (xRaw > mXOffset+mTileSize && xRaw < mXOffset+(mTileSize-1)*mXTileCount){
-						///xRotate = xRaw;
-						xInitPos = (int)Math.floor((xRaw - (mXOffset))/mTileSize);
-						if (xInitPos >= tetr.getXPos() && xInitPos <= tetr.getXPos() + 3)
-							onMove = true;
-					}
-					
-					
+					xInitRaw = (int) Math.floor(event.getRawX());
+					yInitRaw = (int) Math.floor(event.getRawY());
+					wasMoved = false;
 				}
 
 				if(event.getAction() == MotionEvent.ACTION_MOVE) {
-					int xCurRow = (int) Math.floor(event.getRawX());
-					int xCurPos = (int)Math.floor((xCurRow-mXOffset)/(mTileSize));
-					if (onMove){
-						
-						if (tetr.getXPos() > xCurPos) {
-							mapCur.resetMap();
-							mapCur.copyFrom(mapOld);
-							if(tetr.moveLeft(mapCur))
-								mapCur.putTetrinoOnMap(tetr);
-							else
-								mapCur.copyFrom(mapLast);
-							update();
-						}
-						else if(tetr.getXPos() + 2 < xCurPos) {
-							mapCur.resetMap();
-							mapCur.copyFrom(mapOld);
-							if(tetr.moveRight(mapCur))
-								mapCur.putTetrinoOnMap(tetr);
-							else
-								mapCur.copyFrom(mapLast);
-							update();
-						}
-						
-						}
+					int xCurRaw = (int) Math.floor(event.getRawX());
+					if ((xInitRaw - xCurRaw) > xMoveSens) {
+						wasMoved = true;
+						xInitRaw = xCurRaw;
+						mapCur.resetMap();
+						mapCur.copyFrom(mapOld);
+						if(tetr.moveLeft(mapCur))
+							mapCur.putTetrinoOnMap(tetr);
+						else
+							mapCur.copyFrom(mapLast);
+						update();
 					}
+					else if((xCurRaw - xInitRaw) > xMoveSens) {
+						wasMoved = true;
+						xInitRaw = xCurRaw;
+						mapCur.resetMap();
+						mapCur.copyFrom(mapOld);
+						if(tetr.moveRight(mapCur))
+							mapCur.putTetrinoOnMap(tetr);
+						else
+							mapCur.copyFrom(mapLast);
+						update();
+					}
+				}
 					
 				//when screen is released
 				if(event.getAction() == MotionEvent.ACTION_UP)
 				{
-					onMove = false;
-					int xCurRow = (int) Math.floor(event.getRawX());
-					int yCurRow = (int) Math.floor(event.getRawY());
-					int xCurPos = (int)Math.floor((xCurRow-mXOffset)/(mTileSize));
-					int yCurPos = (int)Math.floor((yCurRow-mYOffset)/(mTileSize));
-					
-					//Drop tetrino (relesed on lower y position)
-					Log.d(TAG,"on up action yCurPos = " +Integer.toString(yCurPos));
-					if(yCurPos - yInitPos > dropSensativity ) {
+					int yCurRaw = (int) Math.floor(event.getRawY());
+					if(yCurRaw - yInitRaw > dropSensativity ) {
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
 						if(tetr.drop(mapCur))
@@ -300,7 +282,7 @@ public class MainMap extends TileView{
 						update();
 					}
 					//Rotate tetrino (release on same x pos) 
-					else if (xInitPos == xCurPos) {
+					else if (!wasMoved && (int)Math.abs(yCurRaw - yInitRaw) < rotateSens ) {
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
 						if(tetr.rotateTetrino(mapCur))

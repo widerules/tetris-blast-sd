@@ -28,7 +28,7 @@ public abstract class Tetrino {
 				temp[col][row] = sMap[row][2-col];
 			}
 		}
-		if(!isColusionX(this.pos.x, map) && !isColusionY(this.pos.y, map)) {
+		if(!isColusionX(this.pos.x, temp, map) && !isColusionY(this.pos.y, temp, map)) {
 			sMap = temp;
 			return true;
 		}
@@ -63,12 +63,12 @@ public abstract class Tetrino {
 		return true;
 	}
 	
-	protected boolean isColusionY(int newY, TetrinoMap map) {
+	protected boolean isColusionY(int newY, int[][] tMap,TetrinoMap map) {
 		// TODO Auto-generated method stub
 		if(newY < 20) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (sMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
 						if (newY + row >= TetrinoMap.MAP_Y_SIZE ||
 								map.getMapValue(this.pos.x + col, newY + row) != TileView.BLOCK_EMPTY)
 							return true;
@@ -87,19 +87,19 @@ public abstract class Tetrino {
 	 * @return true is success else false
 	 */
 	public boolean moveDown(TetrinoMap map) {
-		if(!isColusionY(this.pos.y+1,map)) {
+		if(!isColusionY(this.pos.y+1, sMap, map)) {
 			this.pos.y++;
 			return true;
 		}
 		return false;
 	}
 	
-	protected boolean isColusionX(int newX, TetrinoMap map) {
+	protected boolean isColusionX(int newX, int[][] tMap,TetrinoMap map) {
 		// TODO Auto-generated method stub
-		if(newX >= 0 && newX < 10) {
+		if(newX >= -1 && newX < 10) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (sMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
 						if (newX + col >= TetrinoMap.MAP_X_SIZE || newX + col < 0 ||
 								map.getMapValue(newX + col, this.pos.y + row) != TileView.BLOCK_EMPTY)
 							return true;
@@ -115,7 +115,7 @@ public abstract class Tetrino {
 
 
 	public boolean moveLeft(TetrinoMap map) {
-		if(!isColusionX(this.pos.x-1, map)) {
+		if(!isColusionX(this.pos.x-1, sMap, map)) {
 			this.pos.x--;
 			return true;
 		}
@@ -123,7 +123,7 @@ public abstract class Tetrino {
 	}
 	
 	public boolean moveRight(TetrinoMap map) {
-		if(!isColusionX(this.pos.x+1, map)) {
+		if(!isColusionX(this.pos.x+1, sMap, map)) {
 			this.pos.x++;
 			return true;
 		}
@@ -133,7 +133,7 @@ public abstract class Tetrino {
 	public boolean drop(TetrinoMap map) {
 		//int setY = this.pos.y;
 		for (int y = 1; y < 20; y++) {//TODO change to defined values
-			if(isColusionY(y, map)) {
+			if(isColusionY(y,sMap, map)) {
 				this.pos.y = y-1;
 				return true;
 			}
