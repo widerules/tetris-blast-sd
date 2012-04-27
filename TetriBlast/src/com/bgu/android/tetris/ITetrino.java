@@ -38,7 +38,7 @@ public class ITetrino extends Tetrino {
 				temp[col][row] = sMap[row][3-col];
 			}
 		}
-		if(!isColusionX(getXPos(), map) && !isColusionY(getYPos(), map)) {
+		if(!isColusionX(getXPos(), temp, map) && !isColusionY(getYPos(), temp, map)) {
 			sMap = temp;
 			return true;
 		}
