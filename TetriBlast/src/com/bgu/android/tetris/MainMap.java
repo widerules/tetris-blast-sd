@@ -44,9 +44,9 @@ public class MainMap extends TileView{
 	private boolean noShape;
 	
 	//two dimensional array hold the main tetris map 
-	private TetrinoMap mapCur = new TetrinoMap();
-	private TetrinoMap mapOld = new TetrinoMap();
-	private TetrinoMap mapLast = new TetrinoMap();
+	private static TetrinoMap mapCur;
+	public static TetrinoMap mapOld;
+	private static TetrinoMap mapLast;
 	   
 	private boolean wasMoved;
 	private int xInitRaw;
@@ -107,6 +107,9 @@ public class MainMap extends TileView{
 	private void initMainMap() {
 		setFocusable(true);
 		Resources r = this.getContext().getResources();
+		mapCur = new TetrinoMap();
+		mapOld = new TetrinoMap();
+		mapLast = new TetrinoMap();
 		resetTiles(NUM_OF_TILES+10);//TODO fix this
 		loadTile(BLOCK_RED, r.getDrawable(R.drawable.block_red));
 		loadTile(BLOCK_BLUE, r.getDrawable(R.drawable.block_blue));
@@ -158,24 +161,24 @@ public class MainMap extends TileView{
 		}
 	}
 	
-	/**
-	 * Given a ArrayList of coordinates, we need to flatten them into an array of
-	 * ints before we can stuff them into a map for flattening and storage.
-	 * 
-	 * @param pointsList : a ArrayList of Coordinate objects
-	 * @return : a simple array containing the x/y values of the coordinates
-	 * as [x1,y1,x2,y2,x3,y3...]
-	 */
-	private int[] coordArrayListToArray(ArrayList<Point> pointsList) {
-		int count = pointsList.size();
-		int[] rawArray = new int[count * 2];
-		for (int index = 0; index < count; index++) {
-			Point c = pointsList.get(index);
-			rawArray[2 * index] = c.x;
-			rawArray[2 * index + 1] = c.y;
-		}
-		return rawArray;
-	}
+//	/**
+//	 * Given a ArrayList of coordinates, we need to flatten them into an array of
+//	 * ints before we can stuff them into a map for flattening and storage.
+//	 * 
+//	 * @param pointsList : a ArrayList of Coordinate objects
+//	 * @return : a simple array containing the x/y values of the coordinates
+//	 * as [x1,y1,x2,y2,x3,y3...]
+//	 */
+//	private int[] coordArrayListToArray(ArrayList<Point> pointsList) {
+//		int count = pointsList.size();
+//		int[] rawArray = new int[count * 2];
+//		for (int index = 0; index < count; index++) {
+//			Point c = pointsList.get(index);
+//			rawArray[2 * index] = c.x;
+//			rawArray[2 * index + 1] = c.y;
+//		}
+//		return rawArray;
+//	}
 
 	/**
 	 * Save game state so that the user does not lose anything
@@ -187,27 +190,27 @@ public class MainMap extends TileView{
 	public Bundle saveState() {
 		Bundle map = new Bundle();
 
-		map.putIntArray("mTileList", coordArrayListToArray(mTileList));
-		map.putLong("mMoveDelay", Long.valueOf(mMoveDelay));
+		//map.putIntArray("mTileList", coordArrayListToArray(mTileList));
+		//map.putLong("mMoveDelay", Long.valueOf(mMoveDelay));
 		return map;
 	}
 
-	/**
-	 * Given a flattened array of ordinate pairs, we reconstitute them into a
-	 * ArrayList of Coordinate objects
-	 * 
-	 * @param rawArray : [x1,y1,x2,y2,...]
-	 * @return a ArrayList of Coordinates
-	 */
-	private ArrayList<Point> coordArrayToArrayList(int[] rawArray) {
-		ArrayList<Point> coordArrayList = new ArrayList<Point>();
-		int coordCount = rawArray.length;
-		for (int index = 0; index < coordCount; index += 2) {
-			Point c = new Point(rawArray[index], rawArray[index + 1]);
-			coordArrayList.add(c);
-		}
-		return coordArrayList;
-	}
+//	/**
+//	 * Given a flattened array of ordinate pairs, we reconstitute them into a
+//	 * ArrayList of Coordinate objects
+//	 * 
+//	 * @param rawArray : [x1,y1,x2,y2,...]
+//	 * @return a ArrayList of Coordinates
+//	 */
+//	private ArrayList<Point> coordArrayToArrayList(int[] rawArray) {
+//		ArrayList<Point> coordArrayList = new ArrayList<Point>();
+//		int coordCount = rawArray.length;
+//		for (int index = 0; index < coordCount; index += 2) {
+//			Point c = new Point(rawArray[index], rawArray[index + 1]);
+//			coordArrayList.add(c);
+//		}
+//		return coordArrayList;
+//	}
 
 	/**
 	 * Restore game state if our process is being relaunched
@@ -216,8 +219,8 @@ public class MainMap extends TileView{
 	 */
 	public void restoreState(Bundle icicle) {
 		//setMode(PAUSE);
-		mTileList = coordArrayToArrayList(icicle.getIntArray("mTileList"));
-		mMoveDelay = icicle.getLong("mMoveDelay");
+		//mTileList = coordArrayToArrayList(icicle.getIntArray("mTileList"));
+		//mMoveDelay = icicle.getLong("mMoveDelay");
 	}
 	    
 	/*
@@ -244,7 +247,8 @@ public class MainMap extends TileView{
 
 				if(event.getAction() == MotionEvent.ACTION_MOVE) {
 					int xCurRaw = (int) Math.floor(event.getRawX());
-					if ((xInitRaw - xCurRaw) > xMoveSens) {
+					int yCurRaw = (int)Math.floor(event.getRawY());
+					if ((xInitRaw - xCurRaw) > xMoveSens && (int)Math.abs(yInitRaw - yCurRaw) < dropSensativity) {
 						wasMoved = true;
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
@@ -255,7 +259,7 @@ public class MainMap extends TileView{
 							mapCur.copyFrom(mapLast);
 						update();
 					}
-					else if((xCurRaw - xInitRaw) > xMoveSens) {
+					else if((xCurRaw - xInitRaw) > xMoveSens && (int)Math.abs(yInitRaw - yCurRaw) < dropSensativity) {
 						wasMoved = true;
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
@@ -318,7 +322,7 @@ public class MainMap extends TileView{
 				noShape = true;
 				mapCur.copyFrom(mapLast);
 				int i = mapCur.lineCheckAndClear();
-				Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
+				//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
 				mapOld.copyFrom(mapCur);
 			}
 		}

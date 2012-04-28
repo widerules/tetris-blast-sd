@@ -18,6 +18,7 @@ public class TetriBlastActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.d(TAG, "Create main layout");
+        getWindow().setBackgroundDrawableResource(R.drawable.bg);//Draw background
         mMainMapView = (MainMap) findViewById(R.id.tetris);
         mMainMapView.initNewGame();
         //TextView myText = (TextView) findViewById(R.id.txt);

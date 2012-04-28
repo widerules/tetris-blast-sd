@@ -5,10 +5,18 @@ public class ITetrino extends Tetrino {
 	public static final int I_SIZE = 4;	
 	public ITetrino(int x, int y) {
 		super(x, y);
+		initTetrino();
+		if(ghostEnabled)
+			initGhost();
+	}
+
+	private void initTetrino() {
 		sMap = new int[I_SIZE][I_SIZE];
+		gMap = new int[I_SIZE][I_SIZE];
 		for(int col = 0; col < I_SIZE; col++) {
 			for(int row = 0; row < I_SIZE; row++) {
 				sMap[col][row] = 0;
+				gMap[col][row] = 0;
 			}
 		}
 		this.sMap[0][0] = 0;
@@ -27,9 +35,13 @@ public class ITetrino extends Tetrino {
 		this.sMap[3][1] = 0;
 		this.sMap[3][2] = 0;
 		this.sMap[3][3] = 0;
-		// TODO Auto-generated constructor stub
 	}
-	
+	@Override
+	protected void initGhost() {
+		copyTetrinoMap(sMap, gMap, I_SIZE);
+		ghostPos.set(getXPos(), getYPos());
+		setGhostY();
+	}
 	@Override
 	public boolean rotateTetrino(TetrinoMap map) {
 		int[][] temp = new int[I_SIZE][I_SIZE];
@@ -38,8 +50,11 @@ public class ITetrino extends Tetrino {
 				temp[col][row] = sMap[row][3-col];
 			}
 		}
-		if(!isColusionX(getXPos(), temp, map) && !isColusionY(getYPos(), temp, map)) {
+		if(!isColusionX(getXPos(), temp, map) && !isColusionY(getYPos(), temp, map, false)) {
 			sMap = temp;
+			resetGhost(I_SIZE);
+			copyTetrinoMap(temp, gMap, I_SIZE);
+			setGhostY();
 			return true;
 		}
 		return false;

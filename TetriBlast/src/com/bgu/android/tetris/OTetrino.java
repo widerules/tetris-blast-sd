@@ -4,6 +4,11 @@ public class OTetrino extends Tetrino {
 	private static final int BLOCK_TYPE = TileView.BLOCK_YELLOW;
 	public OTetrino(int x, int y) {
 		super(x, y);
+		initTetrino();
+		if(ghostEnabled)
+			initGhost();
+	}
+	private void initTetrino() {
 		this.sMap[0][0] = BLOCK_TYPE;
 		this.sMap[0][1] = BLOCK_TYPE;
 		this.sMap[0][2] = 0;
@@ -13,7 +18,6 @@ public class OTetrino extends Tetrino {
 		this.sMap[2][0] = 0;
 		this.sMap[2][1] = 0;
 		this.sMap[2][2] = 0;
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
