@@ -66,7 +66,7 @@ public class TileView extends View {
         super(context, attrs, defStyle);
         Log.d(TAG, "TileView constructor 1");
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
-        myText = (TextView) findViewById(R.id.txt);
+        //myText = (TextView) findViewById(R.id.txt);
         mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
         Log.d(TAG, "In constructor1: The tile size = " + Integer.toString(mTileSize));
         //myText.setText("In constructor1: The tile size = " + Integer.toString(mTileSize));
@@ -77,7 +77,7 @@ public class TileView extends View {
         super(context, attrs);
         Log.d(TAG, "TileView constructor 2");
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
-        myText = (TextView) findViewById(R.id.txt);
+        //myText = (TextView) findViewById(R.id.txt);
         mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
         Log.d(TAG, "In constructor2: The tile size = " + Integer.toString(mTileSize));
         //myText.setText("In constructor2: The tile size = " + Integer.toString(mTileSize));
@@ -99,7 +99,8 @@ public class TileView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
-    	mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
+    	//mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
+        mXOffset = 0;
         mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
         mTileGrid = new int[mXTileCount][mYTileCount];
         clearTiles();

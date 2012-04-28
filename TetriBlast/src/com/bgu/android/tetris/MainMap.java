@@ -62,7 +62,7 @@ public class MainMap extends TileView{
 		public void handleMessage(Message msg) {
 			if(isReady) {
 				clearTiles();
-				updateWalls();
+				//updateWalls();
 				updateMap();
 				mapCur.resetMap();
 				mapCur.copyFrom(mapOld);
