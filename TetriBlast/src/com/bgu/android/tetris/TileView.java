@@ -98,17 +98,9 @@ public class TileView extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        //mXTileCount = (int) Math.floor(w / mTileSize);
-        //mYTileCount = (int) Math.floor(h / mTileSize);
-    	Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
-    	if(w == 800) {
-    		mTileSize = 18;
-    	}
-    	Log.d(TAG, "The tile size changed to = " + Integer.toString(mTileSize));
-    	//resetTiles(20);//TODO check this
-        mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
+        Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
+    	mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
         mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
-
         mTileGrid = new int[mXTileCount][mYTileCount];
         clearTiles();
     }

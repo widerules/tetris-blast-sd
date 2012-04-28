@@ -4,12 +4,10 @@ public class TetrinoMap {
 	public static final int MAP_X_SIZE = 10;
 	public static final int MAP_Y_SIZE = 20;
 	private int[][] map;
-	//private HashMap<Point, Integer> map;
-	
+		
 	public TetrinoMap() {
 		map = new int[MAP_X_SIZE][MAP_Y_SIZE];
-		this.resetMap();
-		
+		this.resetMap();	
 	}
 	
 	public TetrinoMap(int x, int y) {
@@ -31,20 +29,15 @@ public class TetrinoMap {
 	 * @return true if puts successful otherwise false
 	 */
 	public boolean putTetrinoOnMap(Tetrino shape) {
-//		for(int col = 0; col < shape.getSize(); col++){
-//			for(int row = 0; row < shape.getSize(); row++) {
-//				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
-//					if (shape.getXPos() + col >= TetrinoMap.MAP_X_SIZE || 
-//							shape.getYPos() + row >= TetrinoMap.MAP_Y_SIZE ||
-//							map[shape.getXPos()+col][shape.getYPos()+row] != TileView.BLOCK_EMPTY)
-//						return false;
-//				}
-//			}
-//		}
 		for(int col = 0; col < shape.getSize(); col++){
 			for(int row = 0; row < shape.getSize(); row++) {
 				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) 
 					map[shape.getXPos()+col][shape.getYPos()+row] = shape.sMap[col][row];
+				if(Tetrino.ghostEnabled && !shape.onGhost()) {
+					if(shape.gMap[col][row] != TileView.BLOCK_EMPTY)
+						map[shape.getGhostXPos()+col][shape.getGhostYPos()+row] = shape.gMap[col][row];
+				}
+					
 				}	
 			}
 		return true;
