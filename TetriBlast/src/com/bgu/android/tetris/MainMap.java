@@ -37,26 +37,53 @@ public class MainMap extends TileView{
 	 * function to cause an update/invalidate to occur at a later date.
 	 */
 	private RefreshHandler mRedrawHandler = new RefreshHandler();
+	/**
+	 * This is speed parameter of the game
+	 */
 	private long mMoveDelay;
+	
 	private boolean isReady = false;
+	private boolean noShape = true;
+	private Tetrino curTetrino;
 	
-	private Tetrino tetr;
-	private boolean noShape;
-	
-	//two dimensional array hold the main tetris map 
+	/**
+	 * Two dimensional arrays hold the tetris map
+	 * - mapCur - hold the current map
+	 * - mapOld - hold the map without current tetrino
+	 * - mapLast - hold the map before last move of tetrino 
+	 */
 	private static TetrinoMap mapCur;
 	public static TetrinoMap mapOld;
 	private static TetrinoMap mapLast;
 	   
+	/**
+	 *  This parameter is the flag that indicate that Action_Down event 
+	 *  was occur and tetrino was moved left or right
+	 */
 	private boolean wasMoved;
+	
+	/**
+	 * Initial coordinate of the Action_Down event 
+	 */
 	private int xInitRaw;
 	private int yInitRaw;
+	
+	/**
+	 * X move sensitivity
+	 */
 	private static final int xMoveSens = 30;
+	
+	/**
+	 * Rotate sensitivity
+	 */
 	private static final int rotateSens = 10; 
+	/**
+	 * Drop down sensitivity
+	 */
 	private static final int dropSensativity = 100;//~30*3.5
 	
 	
-	class RefreshHandler extends Handler {
+	private class RefreshHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
@@ -93,6 +120,8 @@ public class MainMap extends TileView{
 		Log.d(TAG, "MainMap constructor");
 		initMainMap();
 	}
+	
+	
 
 	public MainMap(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -106,24 +135,10 @@ public class MainMap extends TileView{
 	 */
 	private void initMainMap() {
 		setFocusable(true);
-		Resources r = this.getContext().getResources();
 		mapCur = new TetrinoMap();
 		mapOld = new TetrinoMap();
 		mapLast = new TetrinoMap();
 		resetTiles(NUM_OF_TILES+10);//TODO fix this
-		loadTile(BLOCK_RED, r.getDrawable(R.drawable.block_red));
-		loadTile(BLOCK_BLUE, r.getDrawable(R.drawable.block_blue));
-		loadTile(BLOCK_GREEN, r.getDrawable(R.drawable.block_green));
-		loadTile(BLOCK_YELLOW, r.getDrawable(R.drawable.block_yelow));
-		loadTile(BLOCK_PINK, r.getDrawable(R.drawable.block_pink));
-		loadTile(BLOCK_LIGHBLUE, r.getDrawable(R.drawable.block_lightblue));
-		loadTile(BLOCK_ORANGE, r.getDrawable(R.drawable.block_orange));
-		loadTile(BLOCK_GREY, r.getDrawable(R.drawable.block_grey));
-		loadTile(BLOCK_GHOST, r.getDrawable(R.drawable.block_ghost2));
-		loadTile(BLOCK_BLOCK, r.getDrawable(R.drawable.block_block));
-		loadTile(BLOCK_BG1, r.getDrawable(R.drawable.block_bg1));
-		loadTile(BLOCK_BG2, r.getDrawable(R.drawable.block_bg2));
-
 	}
 	    
 
@@ -253,8 +268,8 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(tetr.moveLeft(mapCur))
-							mapCur.putTetrinoOnMap(tetr);
+						if(curTetrino.moveLeft(mapCur))
+							mapCur.putTetrinoOnMap(curTetrino);
 						else
 							mapCur.copyFrom(mapLast);
 						update();
@@ -264,8 +279,8 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(tetr.moveRight(mapCur))
-							mapCur.putTetrinoOnMap(tetr);
+						if(curTetrino.moveRight(mapCur))
+							mapCur.putTetrinoOnMap(curTetrino);
 						else
 							mapCur.copyFrom(mapLast);
 						update();
@@ -279,8 +294,8 @@ public class MainMap extends TileView{
 					if(yCurRaw - yInitRaw > dropSensativity ) {
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(tetr.drop(mapCur))
-							mapCur.putTetrinoOnMap(tetr);
+						if(curTetrino.drop(mapCur))
+							mapCur.putTetrinoOnMap(curTetrino);
 						else
 							mapCur.copyFrom(mapLast);
 						update();
@@ -289,8 +304,8 @@ public class MainMap extends TileView{
 					else if (!wasMoved && (int)Math.abs(yCurRaw - yInitRaw) < rotateSens ) {
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(tetr.rotateTetrino(mapCur))
-							mapCur.putTetrinoOnMap(tetr);
+						if(curTetrino.rotateTetrino(mapCur))
+							mapCur.putTetrinoOnMap(curTetrino);
 						else
 							mapCur.copyFrom(mapLast);
 						update();
@@ -308,14 +323,14 @@ public class MainMap extends TileView{
 	private void moveShape() {
 		if (noShape) {
 			noShape = false;
-			tetr = newTetrino(tempCount%7, 5, 0);//TODO check this
+			curTetrino = newTetrino(tempCount%7, 5, 0);//TODO check this
 			tempCount++;
-			mapCur.putTetrinoOnMap(tetr);
+			mapCur.putTetrinoOnMap(curTetrino);
 		}
 		else
 		{
-			if(tetr.moveDown(mapCur)){
-				mapCur.putTetrinoOnMap(tetr);
+			if(curTetrino.moveDown(mapCur)){
+				mapCur.putTetrinoOnMap(curTetrino);
 			}
 			else {
 				
@@ -334,14 +349,8 @@ public class MainMap extends TileView{
 	 */
 	public void update() {
 		if(isReady) {
-			//clearTiles();
-			//updateWalls();
 			updateMap();
-			//mapCur.resetMap();
-			//mapCur.copyFrom(mapOld);
-			MainMap.this.invalidate();
-			//moveShape();//TODO insert this function to the Tetrino
-			
+			MainMap.this.invalidate();		
 		}
 	}
 		
@@ -349,25 +358,25 @@ public class MainMap extends TileView{
 		mapLast.copyFrom(mapCur);
 		for(int col = 0; col < TetrinoMap.MAP_X_SIZE; col++){
 			for(int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
-				setTile(mapCur.getMapValue(col, row), 1+col, 1+row);
+				setTile(mapCur.getMapValue(col, row), col, row);
 			}
 		}
 		
 	}
 
-	/**
-	 * Draws some walls.
-	 * 
-	 */
-	private void updateWalls() {
-		for (int x = 0; x < mXTileCount; x++) {
-			setTile(BLOCK_GREY, x, 0);
-			setTile(BLOCK_GREY, x, mYTileCount - 1);
-		}
-		for (int y = 1; y < mYTileCount - 1; y++) {
-			setTile(BLOCK_GREY, 0, y);
-			setTile(BLOCK_GREY, mXTileCount - 1, y);
-		}
-	}
+//	/**
+//	 * Draws some walls.
+//	 * 
+//	 */
+//	private void updateWalls() {
+//		for (int x = 0; x < mXTileCount; x++) {
+//			setTile(BLOCK_GREY, x, 0);
+//			setTile(BLOCK_GREY, x, mYTileCount - 1);
+//		}
+//		for (int y = 1; y < mYTileCount - 1; y++) {
+//			setTile(BLOCK_GREY, 0, y);
+//			setTile(BLOCK_GREY, mXTileCount - 1, y);
+//		}
+//	}
 	    
 }
