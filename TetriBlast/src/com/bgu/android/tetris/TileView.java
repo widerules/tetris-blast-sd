@@ -1,6 +1,7 @@
 package com.bgu.android.tetris;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -36,11 +37,11 @@ public class TileView extends View {
      * Width/Height are in pixels, and Drawables will be scaled to fit to these
      * dimensions. X/Y Tile Counts are the number of tiles that will be drawn.
      */
-
+	protected static final double mXRatio = 0.625; //This is ratio of the tetris map to size of view
     protected static int mTileSize;
 
-    protected static final int mXTileCount = 12;
-    protected static final int mYTileCount = 22;
+    protected static final int mXTileCount = 10;
+    protected static final int mYTileCount = 20;
 
     protected static int mXOffset;
     protected static int mYOffset;
@@ -60,29 +61,20 @@ public class TileView extends View {
 
     private final Paint mPaint = new Paint();
 
+    
+    //protected boolean mInflated = false;
     public TextView myText;
     //Constructors
     public TileView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Log.d(TAG, "TileView constructor 1");
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
-        //myText = (TextView) findViewById(R.id.txt);
-        mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
-        Log.d(TAG, "In constructor1: The tile size = " + Integer.toString(mTileSize));
-        //myText.setText("In constructor1: The tile size = " + Integer.toString(mTileSize));
-        a.recycle();
+        mTileGrid = new int[mXTileCount][mYTileCount];
     }
 
     public TileView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.d(TAG, "TileView constructor 2");
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TileView);
-        //myText = (TextView) findViewById(R.id.txt);
-        mTileSize = a.getInt(R.styleable.TileView_tileSize, 30);
-        Log.d(TAG, "In constructor2: The tile size = " + Integer.toString(mTileSize));
-        //myText.setText("In constructor2: The tile size = " + Integer.toString(mTileSize));
-        a.recycle();
+        mTileGrid = new int[mXTileCount][mYTileCount];
     }
+    
 
      /**
      * Rests the internal array of Bitmaps used for drawing tiles, and
@@ -98,12 +90,29 @@ public class TileView extends View {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
-    	//mXOffset = ((w - (mTileSize * mXTileCount)) / 2);
-        mXOffset = 0;
-        mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
-        mTileGrid = new int[mXTileCount][mYTileCount];
+    	calculateTileSize(w, h);
+    	Resources r = this.getContext().getResources();
+        loadTile(BLOCK_RED, r.getDrawable(R.drawable.block_red));
+		loadTile(BLOCK_BLUE, r.getDrawable(R.drawable.block_blue));
+		loadTile(BLOCK_GREEN, r.getDrawable(R.drawable.block_green));
+		loadTile(BLOCK_YELLOW, r.getDrawable(R.drawable.block_yelow));
+		loadTile(BLOCK_PINK, r.getDrawable(R.drawable.block_pink));
+		loadTile(BLOCK_LIGHBLUE, r.getDrawable(R.drawable.block_lightblue));
+		loadTile(BLOCK_ORANGE, r.getDrawable(R.drawable.block_orange));
+		loadTile(BLOCK_GREY, r.getDrawable(R.drawable.block_grey));
+		loadTile(BLOCK_GHOST, r.getDrawable(R.drawable.block_ghost2));
+		loadTile(BLOCK_BLOCK, r.getDrawable(R.drawable.block_block));
+		loadTile(BLOCK_BG1, r.getDrawable(R.drawable.block_bg1));
+		loadTile(BLOCK_BG2, r.getDrawable(R.drawable.block_bg2));
         clearTiles();
+    }
+    
+    protected void calculateTileSize(int w, int h) {
+    	Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
+    	mTileSize = (int)Math.floor((w*mXRatio)/mXTileCount);
+        mXOffset = mTileSize;
+        mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
+        
     }
 
     /**
@@ -122,15 +131,13 @@ public class TileView extends View {
     }
 
     /**
-     * Resets all tiles to 0 (empty)
+     * Resets all tiles to BLOCK_EMPTY
      * 
      */
     public void clearTiles() {
         for (int x = 0; x < mXTileCount; x++) {
             for (int y = 0; y < mYTileCount; y++) {
-            	setTile(0, x, y);
-            	//setTile(4+x%2, x, y);
-                //setTile(5-x%2, x,y+1);
+            	setTile(BLOCK_EMPTY, x, y);
             }
         }
     }
