@@ -27,8 +27,7 @@ public class MainMap extends TileView{
 	 * mSnakeTrail: a list of Coordinates that make up the snake's body
 	 * mAppleList: the secret location of the juicy apples the snake craves.
 	 */
-	private ArrayList<Point> mTileList = new ArrayList<Point>();
-	    
+	
 	//private TetrisShape myShape;
 	
 	/**
@@ -42,7 +41,7 @@ public class MainMap extends TileView{
 	 */
 	private long mMoveDelay;
 	
-	private boolean isReady = false;
+	private int mGameState = PAUSE;
 	private boolean noShape = true;
 	private Tetrino curTetrino;
 	
@@ -81,25 +80,25 @@ public class MainMap extends TileView{
 	 * Drop down sensitivity
 	 */
 	private static final int dropSensativity = 100;//~30*3.5
+	public static final int READY = 1;
+	public static final int PAUSE = 0;
 	
 	
 	private class RefreshHandler extends Handler {
 
 		@Override
 		public void handleMessage(Message msg) {
-			if(isReady) {
+			if(mGameState == READY) {
 				clearTiles();
-				//updateWalls();
 				updateMap();
 				mapCur.resetMap();
 				mapCur.copyFrom(mapOld);
-				moveShape();//TODO insert this function to the Tetrino
-				
+				moveShape();//TODO insert this function to the Tetrino	
+				MainMap.this.invalidate();
 			}
 			mRedrawHandler.sleep(mMoveDelay);
 			//MainMap.this.update();
-			MainMap.this.invalidate();
-			isReady = true;
+			//mGameState = true;
 		}
 
 		public void sleep(long delayMillis) {
@@ -143,7 +142,7 @@ public class MainMap extends TileView{
 	    
 
 	public void initNewGame() {
-		mTileList.clear();
+		//mTileList.clear();
 		Log.d(TAG, "game init");
 		mMoveDelay = 400;//delay [ms]
 		mapCur.resetMap();
@@ -176,24 +175,23 @@ public class MainMap extends TileView{
 		}
 	}
 	
-//	/**
-//	 * Given a ArrayList of coordinates, we need to flatten them into an array of
-//	 * ints before we can stuff them into a map for flattening and storage.
-//	 * 
-//	 * @param pointsList : a ArrayList of Coordinate objects
-//	 * @return : a simple array containing the x/y values of the coordinates
-//	 * as [x1,y1,x2,y2,x3,y3...]
-//	 */
-//	private int[] coordArrayListToArray(ArrayList<Point> pointsList) {
-//		int count = pointsList.size();
-//		int[] rawArray = new int[count * 2];
-//		for (int index = 0; index < count; index++) {
-//			Point c = pointsList.get(index);
-//			rawArray[2 * index] = c.x;
-//			rawArray[2 * index + 1] = c.y;
-//		}
-//		return rawArray;
-//	}
+	/**
+	 * Given a ArrayList of coordinates, we need to flatten them into an array of
+	 * ints before we can stuff them into a map for flattening and storage.
+	 * 
+	 * @param pointsList : a ArrayList of Coordinate objects
+	 * @return : a simple array containing the x/y values of the coordinates
+	 * as [x1,y1,v1,x2,y2,v2,x3,y3,v3...]
+	 */
+	private int[] coordArrayListToArray(TetrinoMap map) {
+		int[] rawArray = new int[TetrinoMap.MAP_X_SIZE*TetrinoMap.MAP_Y_SIZE];
+		for (int col = 0; col < TetrinoMap.MAP_X_SIZE; col++) {
+			for (int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
+				rawArray[row*TetrinoMap.MAP_Y_SIZE+col] = map.getMapValue(col, row);
+			}
+		}
+		return rawArray;
+	}
 
 	/**
 	 * Save game state so that the user does not lose anything
@@ -204,28 +202,28 @@ public class MainMap extends TileView{
 	 */
 	public Bundle saveState() {
 		Bundle map = new Bundle();
-
-		//map.putIntArray("mTileList", coordArrayListToArray(mTileList));
-		//map.putLong("mMoveDelay", Long.valueOf(mMoveDelay));
+		map.putIntArray("mapCur", coordArrayListToArray(mapCur));
+		map.putIntArray("mapLast", coordArrayListToArray(mapLast));
+		map.putIntArray("mapOld", coordArrayListToArray(mapOld));
+		map.putLong("mMoveDelay", Long.valueOf(mMoveDelay));
 		return map;
 	}
 
-//	/**
-//	 * Given a flattened array of ordinate pairs, we reconstitute them into a
-//	 * ArrayList of Coordinate objects
-//	 * 
-//	 * @param rawArray : [x1,y1,x2,y2,...]
-//	 * @return a ArrayList of Coordinates
-//	 */
-//	private ArrayList<Point> coordArrayToArrayList(int[] rawArray) {
-//		ArrayList<Point> coordArrayList = new ArrayList<Point>();
-//		int coordCount = rawArray.length;
-//		for (int index = 0; index < coordCount; index += 2) {
-//			Point c = new Point(rawArray[index], rawArray[index + 1]);
-//			coordArrayList.add(c);
-//		}
-//		return coordArrayList;
-//	}
+	/**
+	 * Given a flattened array of ordinate pairs, we reconstitute them into a
+	 * ArrayList of Coordinate objects
+	 * 
+	 * @param rawArray : [x1,y1,x2,y2,...]
+	 * @return a ArrayList of Coordinates
+	 */
+	private TetrinoMap coordArrayToArrayList(int[] rawArray) {
+		TetrinoMap tMap = new TetrinoMap();//TODO change to get map from argument
+		int arrSize = rawArray.length;
+		for (int i = 0; i < arrSize; i++) {
+			//tMap.setMapValue(i%TetrinoMap.MAP_X_SIZE,(int)(i/TetrinoMap.MAP_Y_SIZE));
+		}
+		return tMap;
+	}
 
 	/**
 	 * Restore game state if our process is being relaunched
@@ -233,9 +231,9 @@ public class MainMap extends TileView{
 	 * @param icicle a Bundle containing the game state
 	 */
 	public void restoreState(Bundle icicle) {
-		//setMode(PAUSE);
+		setMode(PAUSE);
 		//mTileList = coordArrayToArrayList(icicle.getIntArray("mTileList"));
-		//mMoveDelay = icicle.getLong("mMoveDelay");
+		mMoveDelay = icicle.getLong("mMoveDelay");
 	}
 	    
 	/*
@@ -348,7 +346,7 @@ public class MainMap extends TileView{
 	 * state, determining if a move should be made, updating the snake's location.
 	 */
 	public void update() {
-		if(isReady) {
+		if(mGameState == READY) {
 			updateMap();
 			MainMap.this.invalidate();		
 		}
@@ -364,19 +362,11 @@ public class MainMap extends TileView{
 		
 	}
 
-//	/**
-//	 * Draws some walls.
-//	 * 
-//	 */
-//	private void updateWalls() {
-//		for (int x = 0; x < mXTileCount; x++) {
-//			setTile(BLOCK_GREY, x, 0);
-//			setTile(BLOCK_GREY, x, mYTileCount - 1);
-//		}
-//		for (int y = 1; y < mYTileCount - 1; y++) {
-//			setTile(BLOCK_GREY, 0, y);
-//			setTile(BLOCK_GREY, mXTileCount - 1, y);
-//		}
-//	}
+	public void setMode(int state) {
+		// TODO Auto-generated method stub
+		mGameState = state;
+	}
+
+
 	    
 }

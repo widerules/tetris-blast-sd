@@ -2,7 +2,6 @@ package com.bgu.android.tetris;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -10,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 public class TileView extends View {
 	public static final String TAG = "TetrisBlast";
@@ -61,9 +59,7 @@ public class TileView extends View {
 
     private final Paint mPaint = new Paint();
 
-    
-    //protected boolean mInflated = false;
-    public TextView myText;
+    //public TextView myText;
     //Constructors
     public TileView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
