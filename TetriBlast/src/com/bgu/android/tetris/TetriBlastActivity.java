@@ -24,14 +24,14 @@ public class TetriBlastActivity extends Activity {
         //TextView myText = (TextView) findViewById(R.id.txt);
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
-            //mSnakeView.setMode(TetrisView.READY);
+        	mMainMapView.setMode(MainMap.READY);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
             if (map != null) {
-                //mSnakeView.restoreState(map);
+            	mMainMapView.restoreState(map);
             } else {
-                //mSnakeView.setMode(TetrisView.PAUSE);
+            	mMainMapView.setMode(MainMap.PAUSE);
             }
         }
     }
@@ -46,6 +46,6 @@ public class TetriBlastActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         //Store the game state
-        //outState.putBundle(ICICLE_KEY, mSnakeView.saveState());
+        outState.putBundle(ICICLE_KEY, mMainMapView.saveState());
     }
 }
