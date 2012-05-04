@@ -22,6 +22,7 @@ public class TetriBlastActivity extends Activity {
         mMainMapView = (MainMap) findViewById(R.id.tetris);
         mMainMapView.initNewGame();
         //TextView myText = (TextView) findViewById(R.id.txt);
+        
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	mMainMapView.setMode(MainMap.READY);
@@ -40,7 +41,14 @@ public class TetriBlastActivity extends Activity {
     protected void onPause() {
         super.onPause();
         // Pause the game along with the activity
-        //mSnakeView.setMode(TetrisView.PAUSE);
+        mMainMapView.setMode(MainMap.PAUSE);
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onPause();
+        // Pause the game along with the activity
+        mMainMapView.setMode(MainMap.PAUSE);
     }
 
     @Override

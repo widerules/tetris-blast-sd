@@ -31,15 +31,21 @@ public class TetrinoMap {
 	public boolean putTetrinoOnMap(Tetrino shape) {
 		for(int col = 0; col < shape.getSize(); col++){
 			for(int row = 0; row < shape.getSize(); row++) {
-				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) 
-					map[shape.getXPos()+col][shape.getYPos()+row] = shape.sMap[col][row];
+				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
+					if(shape.getXPos() + col >= 0 && shape.getXPos() + col < TetrinoMap.MAP_X_SIZE &&
+							shape.getYPos() + row >= 0 && shape.getYPos() + row < TetrinoMap.MAP_Y_SIZE &&
+							map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_EMPTY) 
+						map[shape.getXPos()+col][shape.getYPos()+row] = shape.sMap[col][row];
+					else
+						return false;
+				}
 				if(Tetrino.ghostEnabled && !shape.onGhost()) {
 					if(shape.gMap[col][row] != TileView.BLOCK_EMPTY)
 						map[shape.getGhostXPos()+col][shape.getGhostYPos()+row] = shape.gMap[col][row];
 				}
-					
-				}	
-			}
+
+			}	
+		}
 		return true;
 	}
 	
@@ -86,5 +92,10 @@ public class TetrinoMap {
 		for (int x = 0; x < 10; x++) {
 			map[x][0] = TileView.BLOCK_EMPTY;
 		}
+	}
+
+	public void setMapValue(int i, int j, int value) {
+		// TODO Auto-generated method stub
+		map[i][j] = value;
 	}
 }
