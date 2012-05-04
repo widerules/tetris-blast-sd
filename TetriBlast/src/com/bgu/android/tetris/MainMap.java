@@ -54,12 +54,14 @@ public class MainMap extends TileView{
 	private static TetrinoMap mapCur;
 	public static TetrinoMap mapOld;
 	private static TetrinoMap mapLast;
-	   
+	  
+	private static int[] randArr = {-1,-1};
 	/**
 	 *  This parameter is the flag that indicate that Action_Down event 
 	 *  was occur and tetrino was moved left or right
 	 */
 	private boolean wasMoved;
+	private boolean pausePresed = false;
 	
 	/**
 	 * Initial coordinate of the Action_Down event 
@@ -93,7 +95,7 @@ public class MainMap extends TileView{
 				updateMap();
 				mapCur.resetMap();
 				mapCur.copyFrom(mapOld);
-				moveShape();//TODO insert this function to the Tetrino	
+				gameMove();//TODO insert this function to the Tetrino	
 				MainMap.this.invalidate();
 			}
 			mRedrawHandler.sleep(mMoveDelay);
@@ -185,9 +187,9 @@ public class MainMap extends TileView{
 	 */
 	private int[] coordArrayListToArray(TetrinoMap map) {
 		int[] rawArray = new int[TetrinoMap.MAP_X_SIZE*TetrinoMap.MAP_Y_SIZE];
-		for (int col = 0; col < TetrinoMap.MAP_X_SIZE; col++) {
-			for (int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
-				rawArray[row*TetrinoMap.MAP_Y_SIZE+col] = map.getMapValue(col, row);
+		for (int row = 0; row < TetrinoMap.MAP_Y_SIZE; row++) {
+			for (int col = 0; col < TetrinoMap.MAP_X_SIZE; col++) {
+				rawArray[row*TetrinoMap.MAP_X_SIZE+col] = map.getMapValue(col, row);
 			}
 		}
 		return rawArray;
@@ -220,7 +222,7 @@ public class MainMap extends TileView{
 		TetrinoMap tMap = new TetrinoMap();//TODO change to get map from argument
 		int arrSize = rawArray.length;
 		for (int i = 0; i < arrSize; i++) {
-			//tMap.setMapValue(i%TetrinoMap.MAP_X_SIZE,(int)(i/TetrinoMap.MAP_Y_SIZE));
+			tMap.setMapValue(i%TetrinoMap.MAP_X_SIZE,(int)(i/TetrinoMap.MAP_Y_SIZE),rawArray[i]);
 		}
 		return tMap;
 	}
@@ -232,7 +234,9 @@ public class MainMap extends TileView{
 	 */
 	public void restoreState(Bundle icicle) {
 		setMode(PAUSE);
-		//mTileList = coordArrayToArrayList(icicle.getIntArray("mTileList"));
+		mapCur = coordArrayToArrayList(icicle.getIntArray("mapCur"));
+		mapLast = coordArrayToArrayList(icicle.getIntArray("mapLast"));
+		mapOld = coordArrayToArrayList(icicle.getIntArray("mapOld"));
 		mMoveDelay = icicle.getLong("mMoveDelay");
 	}
 	    
@@ -256,9 +260,16 @@ public class MainMap extends TileView{
 					xInitRaw = (int) Math.floor(event.getRawX());
 					yInitRaw = (int) Math.floor(event.getRawY());
 					wasMoved = false;
+					if(xInitRaw > 360 && xInitRaw < 450 && yInitRaw > 560 && yInitRaw < 600) {
+						pausePresed = true;
+						if(mGameState == READY)
+							mGameState = PAUSE;
+						else
+							mGameState = READY;
+					}
 				}
 
-				if(event.getAction() == MotionEvent.ACTION_MOVE) {
+				if(event.getAction() == MotionEvent.ACTION_MOVE && mGameState == READY && !pausePresed) {
 					int xCurRaw = (int) Math.floor(event.getRawX());
 					int yCurRaw = (int)Math.floor(event.getRawY());
 					if ((xInitRaw - xCurRaw) > xMoveSens && (int)Math.abs(yInitRaw - yCurRaw) < dropSensativity) {
@@ -266,10 +277,8 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(curTetrino.moveLeft(mapCur))
-							mapCur.putTetrinoOnMap(curTetrino);
-						else
-							mapCur.copyFrom(mapLast);
+						curTetrino.moveLeft(mapCur);
+						mapCur.putTetrinoOnMap(curTetrino);
 						update();
 					}
 					else if((xCurRaw - xInitRaw) > xMoveSens && (int)Math.abs(yInitRaw - yCurRaw) < dropSensativity) {
@@ -277,10 +286,8 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						if(curTetrino.moveRight(mapCur))
-							mapCur.putTetrinoOnMap(curTetrino);
-						else
-							mapCur.copyFrom(mapLast);
+						curTetrino.moveRight(mapCur);
+						mapCur.putTetrinoOnMap(curTetrino);
 						update();
 					}
 				}
@@ -288,27 +295,28 @@ public class MainMap extends TileView{
 				//when screen is released
 				if(event.getAction() == MotionEvent.ACTION_UP)
 				{
-					int yCurRaw = (int) Math.floor(event.getRawY());
-					if(yCurRaw - yInitRaw > dropSensativity ) {
-						mapCur.resetMap();
-						mapCur.copyFrom(mapOld);
-						if(curTetrino.drop(mapCur))
+					if(mGameState == READY && !pausePresed){
+						int yCurRaw = (int) Math.floor(event.getRawY());
+						if(yCurRaw - yInitRaw > dropSensativity ) {
+							mapCur.resetMap();
+							mapCur.copyFrom(mapOld);
+							curTetrino.drop(mapCur);
 							mapCur.putTetrinoOnMap(curTetrino);
-						else
-							mapCur.copyFrom(mapLast);
-						update();
-					}
-					//Rotate tetrino (release on same x pos) 
-					else if (!wasMoved && (int)Math.abs(yCurRaw - yInitRaw) < rotateSens ) {
-						mapCur.resetMap();
-						mapCur.copyFrom(mapOld);
-						if(curTetrino.rotateTetrino(mapCur))
+							update();
+						}
+						//Rotate tetrino (release on same x pos) 
+						else if (!wasMoved && (int)Math.abs(yCurRaw - yInitRaw) < rotateSens ) {
+							mapCur.resetMap();
+							mapCur.copyFrom(mapOld);
+							curTetrino.rotateTetrino(mapCur);
 							mapCur.putTetrinoOnMap(curTetrino);
-						else
-							mapCur.copyFrom(mapLast);
-						update();
+							update();
+						}
 					}
+					else
+						pausePresed = false;
 				}
+				
 			}
 			catch (InterruptedException e)
 			{
@@ -317,13 +325,27 @@ public class MainMap extends TileView{
 		}
 		return true;
 	}
-	  
-	private void moveShape() {
+	
+	private int getRandomFromArr() {
+		if (randArr[1] == -1)
+			randArr[1] = (int)Math.floor(Math.random()*7);
+		randArr[0] = randArr[1];//shift to next
+		randArr[1] = (int)Math.floor(Math.random()*7);//next
+		mCurNext = randArr[1];
+		return randArr[0];
+	}
+	
+	private void gameMove() {
 		if (noShape) {
 			noShape = false;
-			curTetrino = newTetrino(tempCount%7, 5, 0);//TODO check this
+			curTetrino = newTetrino(getRandomFromArr(), 4, 0);//TODO check this
+			Log.d(TAG,"Next: " + Integer.toString(randArr[1]));
 			tempCount++;
-			mapCur.putTetrinoOnMap(curTetrino);
+			if(!mapCur.putTetrinoOnMap(curTetrino)) {
+				Log.d(TAG, "Game Over!");
+				initNewGame();
+				mGameState = PAUSE;
+			}
 		}
 		else
 		{

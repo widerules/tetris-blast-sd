@@ -36,6 +36,25 @@ public class ITetrino extends Tetrino {
 		this.sMap[3][2] = 0;
 		this.sMap[3][3] = 0;
 	}
+	
+	@Override
+	protected boolean isColusionX(int newX, int[][] tMap,TetrinoMap map) {
+		if(newX >= -2 && newX < TetrinoMap.MAP_X_SIZE) {
+			for(int col = 0; col < this.getSize(); col++){
+				for(int row = 0; row < this.getSize(); row++) {
+					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
+						if (newX + col >= TetrinoMap.MAP_X_SIZE || newX + col < 0 ||
+								map.getMapValue(newX + col, getYPos() + row) != TileView.BLOCK_EMPTY)
+							return true;
+					}
+				}
+			}
+		}
+		else
+			return true;
+		//if no collisions 
+		return false;
+	} 
 	@Override
 	protected void initGhost() {
 		copyTetrinoMap(sMap, gMap, I_SIZE);

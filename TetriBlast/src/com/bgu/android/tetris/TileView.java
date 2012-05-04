@@ -51,6 +51,7 @@ public class TileView extends View {
      */
     private Bitmap[] mTileArray; 
 
+    private Bitmap[] mNextTetrinoArr;
     /**
      * A two-dimensional array of integers in which the number represents the
      * index of the tile that should be drawn at that locations
@@ -58,6 +59,8 @@ public class TileView extends View {
     private int[][] mTileGrid;
 
     private final Paint mPaint = new Paint();
+
+	protected int mCurNext;
 
     //public TextView myText;
     //Constructors
@@ -81,6 +84,7 @@ public class TileView extends View {
     
     public void resetTiles(int tilecount) {
     	mTileArray = new Bitmap[tilecount];
+    	mNextTetrinoArr = new Bitmap[MainMap.I_TYPE+1];
     }
 
 
@@ -100,6 +104,13 @@ public class TileView extends View {
 		loadTile(BLOCK_BLOCK, r.getDrawable(R.drawable.block_block));
 		loadTile(BLOCK_BG1, r.getDrawable(R.drawable.block_bg1));
 		loadTile(BLOCK_BG2, r.getDrawable(R.drawable.block_bg2));
+		loadNextTetr(MainMap.I_TYPE, r.getDrawable(R.drawable.next_i));
+		loadNextTetr(MainMap.J_TYPE, r.getDrawable(R.drawable.next_j));
+		loadNextTetr(MainMap.L_TYPE, r.getDrawable(R.drawable.next_l));
+		loadNextTetr(MainMap.O_TYPE, r.getDrawable(R.drawable.next_o));
+		loadNextTetr(MainMap.S_TYPE, r.getDrawable(R.drawable.next_s));
+		loadNextTetr(MainMap.T_TYPE, r.getDrawable(R.drawable.next_t));
+		loadNextTetr(MainMap.Z_TYPE, r.getDrawable(R.drawable.next_z));
         clearTiles();
     }
     
@@ -124,6 +135,14 @@ public class TileView extends View {
         tile.setBounds(0, 0, mTileSize, mTileSize);
         tile.draw(canvas);
         mTileArray[key] = bitmap;
+    }
+    
+    public void loadNextTetr(int key, Drawable tetrino) {
+        Bitmap bitmap = Bitmap.createBitmap(90, 90, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        tetrino.setBounds(0, 0, 90, 90);
+        tetrino.draw(canvas);
+        mNextTetrinoArr[key] = bitmap;
     }
 
     /**
@@ -165,7 +184,7 @@ public class TileView extends View {
                 }
             }
         }
-
+        canvas.drawBitmap(mNextTetrinoArr[mCurNext], 370, 140, mPaint);
     }
 
 }

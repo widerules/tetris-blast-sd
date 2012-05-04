@@ -1,10 +1,11 @@
 package com.bgu.android.tetris;
 
 import android.graphics.Point;
+import android.util.Log;
 
 public abstract class Tetrino {
 	public static final int SIZE = 3;
-	public static boolean ghostEnabled = true;
+	public static boolean ghostEnabled = false;
 	public int[][] sMap;
 	public int[][] gMap;//ghost map of tetrino
 	//public int[][] shadowMap;
@@ -78,7 +79,7 @@ public abstract class Tetrino {
 	 * @param pos the pos to set
 	 */
 	public boolean setPos(int x, int y, TetrinoMap map) {
-		if(x >= 0 && x < 10) {
+		if(x >= 0 && x < TetrinoMap.MAP_X_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
 					if (sMap[col][row] != TileView.BLOCK_EMPTY) {
@@ -97,7 +98,7 @@ public abstract class Tetrino {
 	
 	protected boolean isColusionY(int newY, int[][] tMap,TetrinoMap map, boolean isGhost) {
 		// TODO Auto-generated method stub
-		if(newY < 20) {
+		if(newY < TetrinoMap.MAP_Y_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
 					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
@@ -130,12 +131,15 @@ public abstract class Tetrino {
 			this.pos.y++;
 			return true;
 		}
-		return false;
+		else
+			return false;
 	}
 	
 	protected boolean isColusionX(int newX, int[][] tMap,TetrinoMap map) {
 		// TODO Auto-generated method stub
-		if(newX >= -1 && newX < 10) {
+		if(newX >= -1 && newX < TetrinoMap.MAP_X_SIZE) {
+			if(newX == -1)
+				Log.d("TetrisBlast", "fgdf");
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
 					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
@@ -173,20 +177,12 @@ public abstract class Tetrino {
 		return false;
 	}
 	
-	public boolean drop(TetrinoMap map) {
-		if(ghostEnabled) {
+	public void drop(TetrinoMap map) {
+		if(ghostEnabled)
 			this.pos.y = this.ghostPos.y;
-			return true;
-		}
-		else {
-			for (int y = 1; y < TetrinoMap.MAP_Y_SIZE; y++) {//TODO change to defined values
-				if(isColusionY(y,sMap, map, false)) {
-					this.pos.y = y-1;
-					return true;
-				}
-			}
-		}
-		return false;
+		else
+			for (int y = 0; y < TetrinoMap.MAP_Y_SIZE && !isColusionY(y,sMap, map, false); y++)
+				this.pos.y = y;
 	}
 	
 	/**
