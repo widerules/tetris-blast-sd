@@ -9,9 +9,11 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.animation.BounceInterpolator;
 
 public class MainMap extends TileView{
 	public static final int	L_TYPE = 0;
@@ -42,7 +44,7 @@ public class MainMap extends TileView{
 	private long mMoveDelay;
 	
 	private int mGameState = PAUSE;
-	private boolean noShape = true;
+	//private boolean noShape = true;
 	private Tetrino curTetrino;
 	
 	/**
@@ -68,11 +70,13 @@ public class MainMap extends TileView{
 	 */
 	private int xInitRaw;
 	private int yInitRaw;
-	
+	private int yInitDrop;
+	private long initTime;
+	private static final long deltaTh = 300;//threshold time for drop
 	/**
 	 * X move sensitivity
 	 */
-	private static final int xMoveSens = 30;
+	private static final int xMoveSens = 20;
 	
 	/**
 	 * Rotate sensitivity
@@ -81,7 +85,7 @@ public class MainMap extends TileView{
 	/**
 	 * Drop down sensitivity
 	 */
-	private static final int dropSensativity = 100;//~30*3.5
+	private static final int dropSensativity = 80;//~30*3.5
 	public static final int READY = 1;
 	public static final int PAUSE = 0;
 	
@@ -91,14 +95,32 @@ public class MainMap extends TileView{
 		@Override
 		public void handleMessage(Message msg) {
 			if(mGameState == READY) {
-				clearTiles();
-				updateMap();
-				mapCur.resetMap();
-				mapCur.copyFrom(mapOld);
-				gameMove();//TODO insert this function to the Tetrino	
-				MainMap.this.invalidate();
+				if(msg.getData().getBoolean("newTetrino", false) == true) {
+					mapCur.copyFrom(mapLast);
+					int i = mapCur.lineCheckAndClear();
+					//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
+					mapOld.copyFrom(mapCur);
+					
+					curTetrino = newTetrino(getRandomFromArr(), 4, 0);//TODO check this
+					Log.d(TAG,"Next: " + Integer.toString(randArr[1]));
+					tempCount++;
+					if(!mapCur.putTetrinoOnMap(curTetrino)) {
+						Log.d(TAG, "Game Over!");
+						initNewGame();
+						mGameState = PAUSE;
+					}
+					mRedrawHandler.sleep(mMoveDelay);
+				}
+				else {
+					clearTiles();
+					updateMap();
+					mapCur.resetMap();
+					mapCur.copyFrom(mapOld);
+					gameMove();//TODO insert this function to the Tetrino	
+					MainMap.this.invalidate();
+				}
 			}
-			mRedrawHandler.sleep(mMoveDelay);
+			//mRedrawHandler.sleep(mMoveDelay);
 			//MainMap.this.update();
 			//mGameState = true;
 		}
@@ -150,9 +172,13 @@ public class MainMap extends TileView{
 		mapCur.resetMap();
 		mapOld.resetMap();
 		mapLast.resetMap();
-		noShape = true;
+		//noShape = true;
 		tempCount = 0;
-		mRedrawHandler.sleep(mMoveDelay);
+		Message msg = mRedrawHandler.obtainMessage(0);
+		Bundle b = new Bundle();
+		b.putBoolean("newTetrino", true);
+		msg.setData(b);
+		mRedrawHandler.sendMessage(msg);
 	}
 	
 	private Tetrino newTetrino(int type, int x, int y) {
@@ -257,8 +283,10 @@ public class MainMap extends TileView{
 				//when user touches the screen
 				if(event.getAction() == MotionEvent.ACTION_DOWN)
 				{
+					initTime = SystemClock.uptimeMillis();
 					xInitRaw = (int) Math.floor(event.getRawX());
 					yInitRaw = (int) Math.floor(event.getRawY());
+					yInitDrop = yInitRaw;
 					wasMoved = false;
 					if(xInitRaw > 360 && xInitRaw < 450 && yInitRaw > 560 && yInitRaw < 600) {
 						pausePresed = true;
@@ -277,7 +305,13 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						curTetrino.moveLeft(mapCur);
+						if (curTetrino.moveLeft(mapCur) && 
+								!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
+							if (mRedrawHandler.obtainMessage(0).getData().getBoolean("newTetrino") == true) {
+								mRedrawHandler.removeMessages(0);
+								mRedrawHandler.sendMessageDelayed(mRedrawHandler.obtainMessage(0), 400);//TODO convert to parameter
+							}
+						}
 						mapCur.putTetrinoOnMap(curTetrino);
 						update();
 					}
@@ -286,18 +320,35 @@ public class MainMap extends TileView{
 						xInitRaw = xCurRaw;
 						mapCur.resetMap();
 						mapCur.copyFrom(mapOld);
-						curTetrino.moveRight(mapCur);
+						if(curTetrino.moveRight(mapCur) &&
+								!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
+							if (mRedrawHandler.obtainMessage(0).getData().getBoolean("newTetrino") == true) {
+								mRedrawHandler.removeMessages(0);
+								mRedrawHandler.sendMessageDelayed(mRedrawHandler.obtainMessage(0), 400);//TODO convert to parameter
+							}
+						}
 						mapCur.putTetrinoOnMap(curTetrino);
 						update();
+					}
+					if ((yCurRaw - yInitRaw) > xMoveSens) {
+						wasMoved = true;
+						yInitRaw = yCurRaw;
+						mapCur.resetMap();
+						mapCur.copyFrom(mapOld);
+						curTetrino.moveDown(mapCur);
+						mapCur.putTetrinoOnMap(curTetrino);
+						update();
+						
 					}
 				}
 					
 				//when screen is released
 				if(event.getAction() == MotionEvent.ACTION_UP)
 				{
+					long timeDelta = Math.abs(initTime - SystemClock.uptimeMillis()); 
 					if(mGameState == READY && !pausePresed){
 						int yCurRaw = (int) Math.floor(event.getRawY());
-						if(yCurRaw - yInitRaw > dropSensativity ) {
+						if(yCurRaw - yInitDrop > dropSensativity && timeDelta < deltaTh) {
 							mapCur.resetMap();
 							mapCur.copyFrom(mapOld);
 							curTetrino.drop(mapCur);
@@ -336,30 +387,17 @@ public class MainMap extends TileView{
 	}
 	
 	private void gameMove() {
-		if (noShape) {
-			noShape = false;
-			curTetrino = newTetrino(getRandomFromArr(), 4, 0);//TODO check this
-			Log.d(TAG,"Next: " + Integer.toString(randArr[1]));
-			tempCount++;
-			if(!mapCur.putTetrinoOnMap(curTetrino)) {
-				Log.d(TAG, "Game Over!");
-				initNewGame();
-				mGameState = PAUSE;
-			}
+		if(curTetrino.moveDown(mapCur)){
+			mapCur.putTetrinoOnMap(curTetrino);
+			mRedrawHandler.sleep(mMoveDelay);
 		}
-		else
-		{
-			if(curTetrino.moveDown(mapCur)){
-				mapCur.putTetrinoOnMap(curTetrino);
-			}
-			else {
-				
-				noShape = true;
-				mapCur.copyFrom(mapLast);
-				int i = mapCur.lineCheckAndClear();
-				//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
-				mapOld.copyFrom(mapCur);
-			}
+		else {
+
+			Message msg = mRedrawHandler.obtainMessage(0);
+			Bundle b = new Bundle();
+			b.putBoolean("newTetrino", true);
+			msg.setData(b);
+			mRedrawHandler.sendMessageDelayed(msg, 1000);//TODO convert to parametr
 		}
 	}
 
