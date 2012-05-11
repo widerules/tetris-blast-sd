@@ -34,7 +34,8 @@ public class TetrinoMap {
 				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
 					if(shape.getXPos() + col >= 0 && shape.getXPos() + col < TetrinoMap.MAP_X_SIZE &&
 							shape.getYPos() + row >= 0 && shape.getYPos() + row < TetrinoMap.MAP_Y_SIZE &&
-							map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_EMPTY) 
+							(map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_EMPTY ||
+									map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_GHOST)) 
 						map[shape.getXPos()+col][shape.getYPos()+row] = shape.sMap[col][row];
 					else
 						return false;

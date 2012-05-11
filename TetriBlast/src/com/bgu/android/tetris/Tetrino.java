@@ -5,7 +5,7 @@ import android.util.Log;
 
 public abstract class Tetrino {
 	public static final int SIZE = 3;
-	public static boolean ghostEnabled = false;
+	public static boolean ghostEnabled = true;
 	public int[][] sMap;
 	public int[][] gMap;//ghost map of tetrino
 	//public int[][] shadowMap;
@@ -58,13 +58,33 @@ public abstract class Tetrino {
 				temp[col][row] = sMap[row][2-col];
 			}
 		}
-		if(!isColusionX(this.pos.x, temp, map) && !isColusionY(this.pos.y, temp, map, false)) {
+		
+		if(!isColusionX(this.pos.x, temp, map) && !isColusionY(this.pos.y, this.pos.x, temp, map, false)) {
 			sMap = temp;
 			resetGhost(SIZE);
 			copyTetrinoMap(temp, gMap, SIZE);
 			setGhostY();
 			return true;
 		}
+		else if(!isColusionX(this.pos.x-1, temp, map) && !isColusionY(this.pos.y, this.pos.x-1, temp, map, false)) {
+			this.pos.x -=1;
+			this.ghostPos.x -=1;
+			sMap = temp;
+			resetGhost(SIZE);
+			copyTetrinoMap(temp, gMap, SIZE);
+			setGhostY();
+			return true;
+		}
+		else if(!isColusionX(this.pos.x+1, temp, map) && !isColusionY(this.pos.y, this.pos.x+1, temp, map, false)) {
+			this.pos.x +=1;
+			this.ghostPos.x +=1;
+			sMap = temp;
+			resetGhost(SIZE);
+			copyTetrinoMap(temp, gMap, SIZE);
+			setGhostY();
+			return true;
+		}
+		
 		return false;
 	}
 	
@@ -96,21 +116,25 @@ public abstract class Tetrino {
 		return true;
 	}
 	
-	protected boolean isColusionY(int newY, int[][] tMap,TetrinoMap map, boolean isGhost) {
+	protected boolean isColusionY(int newY, int newX, int[][] tMap,TetrinoMap map, boolean isGhost) {
 		// TODO Auto-generated method stub
 		if(newY < TetrinoMap.MAP_Y_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
 					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
-						if (isGhost) {
-							if (newY + row >= TetrinoMap.MAP_Y_SIZE ||
-									map.getMapValue(this.ghostPos.x + col, newY + row) != TileView.BLOCK_EMPTY)
-								return true;
+						if (isGhost) {//TODO need to think about if condition
+							if ((newX + col) >= 0 && (newX + col) < TetrinoMap.MAP_X_SIZE) {
+								if (newY + row >= TetrinoMap.MAP_Y_SIZE || 
+										map.getMapValue(newX + col, newY + row) != TileView.BLOCK_EMPTY)
+									return true;
+							}
 						}
 						else {
-							if (newY + row >= TetrinoMap.MAP_Y_SIZE ||
-									map.getMapValue(this.pos.x + col, newY + row) != TileView.BLOCK_EMPTY)
-								return true;
+							if ((newX + col) >= 0 && (newX + col) < TetrinoMap.MAP_X_SIZE) {
+								if (newY + row >= TetrinoMap.MAP_Y_SIZE ||
+										map.getMapValue(newX + col, newY + row) != TileView.BLOCK_EMPTY)
+									return true;
+							}
 						}
 					}
 				}
@@ -127,7 +151,7 @@ public abstract class Tetrino {
 	 * @return true is success else false
 	 */
 	public boolean moveDown(TetrinoMap map) {
-		if(!isColusionY(this.pos.y+1, sMap, map, false)) {
+		if(!isColusionY(this.pos.y+1, this.pos.x, sMap, map, false)) {
 			this.pos.y++;
 			return true;
 		}
@@ -181,7 +205,7 @@ public abstract class Tetrino {
 		if(ghostEnabled)
 			this.pos.y = this.ghostPos.y;
 		else
-			for (int y = 0; y < TetrinoMap.MAP_Y_SIZE && !isColusionY(y,sMap, map, false); y++)
+			for (int y = 0; y < TetrinoMap.MAP_Y_SIZE && !isColusionY(y, this.pos.x, sMap, map, false); y++)
 				this.pos.y = y;
 	}
 	
@@ -215,7 +239,7 @@ public abstract class Tetrino {
 	
 	protected void setGhostY() {
 		for (ghostPos.y = this.pos.y; 
-				!isColusionY(this.ghostPos.y+1, gMap, MainMap.mapOld, true);
+				!isColusionY(this.ghostPos.y+1, this.ghostPos.x, gMap, MainMap.mapOld, true);
 				this.ghostPos.y++);
 	}
 
