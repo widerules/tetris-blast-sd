@@ -95,7 +95,7 @@ public class MainMap extends TileView{
 		@Override
 		public void handleMessage(Message msg) {
 			if(mGameState == READY) {
-				if(msg.getData().getBoolean("newTetrino", false) == true) {
+				if(msg.what == 1) {//TODO change to final Name
 					mapCur.copyFrom(mapLast);
 					int i = mapCur.lineCheckAndClear();
 					//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
@@ -119,6 +119,7 @@ public class MainMap extends TileView{
 					gameMove();//TODO insert this function to the Tetrino	
 					MainMap.this.invalidate();
 				}
+				
 			}
 			//mRedrawHandler.sleep(mMoveDelay);
 			//MainMap.this.update();
@@ -127,7 +128,8 @@ public class MainMap extends TileView{
 
 		public void sleep(long delayMillis) {
 			this.removeMessages(0);
-			sendMessageDelayed(obtainMessage(0), delayMillis);
+			sendEmptyMessageDelayed(0, delayMillis);
+			//sendMessageDelayed(obtainMessage(0), delayMillis);
 		}
 	};
 
@@ -174,11 +176,7 @@ public class MainMap extends TileView{
 		mapLast.resetMap();
 		//noShape = true;
 		tempCount = 0;
-		Message msg = mRedrawHandler.obtainMessage(0);
-		Bundle b = new Bundle();
-		b.putBoolean("newTetrino", true);
-		msg.setData(b);
-		mRedrawHandler.sendMessage(msg);
+		mRedrawHandler.sendEmptyMessage(1);//TODO change to final name
 	}
 	
 	private Tetrino newTetrino(int type, int x, int y) {
@@ -307,9 +305,9 @@ public class MainMap extends TileView{
 						mapCur.copyFrom(mapOld);
 						if (curTetrino.moveLeft(mapCur) && 
 								!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
-							if (mRedrawHandler.obtainMessage(0).getData().getBoolean("newTetrino") == true) {
-								mRedrawHandler.removeMessages(0);
-								mRedrawHandler.sendMessageDelayed(mRedrawHandler.obtainMessage(0), 400);//TODO convert to parameter
+							if (mRedrawHandler.hasMessages(1) == true) {//TODO change to final Name
+								mRedrawHandler.removeMessages(1);
+								mRedrawHandler.sendEmptyMessageDelayed(0, 400);//TODO convert to parameter and change to final Name
 							}
 						}
 						mapCur.putTetrinoOnMap(curTetrino);
@@ -322,9 +320,9 @@ public class MainMap extends TileView{
 						mapCur.copyFrom(mapOld);
 						if(curTetrino.moveRight(mapCur) &&
 								!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
-							if (mRedrawHandler.obtainMessage(0).getData().getBoolean("newTetrino") == true) {
-								mRedrawHandler.removeMessages(0);
-								mRedrawHandler.sendMessageDelayed(mRedrawHandler.obtainMessage(0), 400);//TODO convert to parameter
+							if (mRedrawHandler.hasMessages(1) == true) {//TODO change to final Name
+								mRedrawHandler.removeMessages(1);
+								mRedrawHandler.sendEmptyMessageDelayed(0, 400);//TODO convert to parameter and change to final Name
 							}
 						}
 						mapCur.putTetrinoOnMap(curTetrino);
@@ -354,6 +352,8 @@ public class MainMap extends TileView{
 							curTetrino.drop(mapCur);
 							mapCur.putTetrinoOnMap(curTetrino);
 							update();
+							mRedrawHandler.removeMessages(0);
+							mRedrawHandler.sendEmptyMessage(1);//TODO change to final name
 						}
 						//Rotate tetrino (release on same x pos) 
 						else if (!wasMoved && (int)Math.abs(yCurRaw - yInitRaw) < rotateSens ) {
@@ -391,13 +391,8 @@ public class MainMap extends TileView{
 			mapCur.putTetrinoOnMap(curTetrino);
 			mRedrawHandler.sleep(mMoveDelay);
 		}
-		else {
-
-			Message msg = mRedrawHandler.obtainMessage(0);
-			Bundle b = new Bundle();
-			b.putBoolean("newTetrino", true);
-			msg.setData(b);
-			mRedrawHandler.sendMessageDelayed(msg, 1000);//TODO convert to parametr
+		else {//TODO convert to parametr and convert to final name
+			mRedrawHandler.sendEmptyMessageDelayed(1, 1000);
 		}
 	}
 
