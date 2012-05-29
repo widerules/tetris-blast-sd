@@ -35,8 +35,7 @@ public class ConnectionActivity extends Activity {
         //getWindow().setBackgroundDrawableResource(R.drawable.tetris_bg);//Draw background
         Button hostBtn = (Button)findViewById(R.id.btn_host);
         Button joinBtn = (Button)findViewById(R.id.btn_join);
-        Button singleBtn = (Button)findViewById(R.id.btn_single_temp);
-        
+                
         hostBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -66,18 +65,6 @@ public class ConnectionActivity extends Activity {
 			}
 		});
         
-        singleBtn.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Intent intt = new Intent(me, TetriBlastActivity.class);
-				startActivity(intt);
-			}
-		});
-        
-        
-     
-
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
