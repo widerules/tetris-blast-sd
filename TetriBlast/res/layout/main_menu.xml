@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical"
+	    android:background="@drawable/general_bg">
+
+	<LinearLayout 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="40dip"
+    android:orientation="horizontal">
+    
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:orientation="vertical">
+	    <TextView
+	        android:id="@+id/txt_main_menu_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:paddingBottom="25dip"
+	        android:textSize="24.5sp"
+	        android:textColor="@color/menu_title"
+	        android:text="Main Menu" />
+	    <Button 
+	        android:id="@+id/btn_main_menu_single"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Singleplayer"/>
+	    
+	    <Button 
+	        android:id="@+id/btn_main_menu_multi"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Multiplayer"/>
+	    
+	    <Button 
+	        android:id="@+id/btn_main_menu_manage"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Manage Profile"/>
+	    
+	    <Button 
+	        android:id="@+id/btn_main_menu_settings"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Settings"/>
+	    
+	    <Button 
+	        android:id="@+id/btn_main_menu_leader"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Leaderboard"/>
+	    
+	    <Button 
+	        android:id="@+id/btn_main_menu_help"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="15dip"
+	        android:text="Help and Credits"/>
+	</LinearLayout>	
+	</LinearLayout>
+	<TextView
+	        android:id="@+id/txt_main_menu_ver"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="12sp"
+	        android:text="ver: " />
+</LinearLayout>
