@@ -57,11 +57,11 @@ public class ConnectionActivity extends Activity {
 		});
         
         joinBtn.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				//Intent intt = new Intent(this, AddItem.class);
-				//startActivity(intt);
+				// Launch the DeviceListActivity to see devices and do scan
+	            Intent serverIntent = new Intent(me, DeviceListActivity.class);
+	            startActivityForResult(serverIntent, REQUEST_DISCOVER_DEVICE);
 			}
 		});
         
