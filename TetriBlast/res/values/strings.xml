@@ -3,5 +3,10 @@
 	<string name="ver_num">1.0</string>
     <string name="hello">Score: 192300</string>
     <string name="app_name">TetriBlast</string>
-
+	<string name="select_device">select a device from the list</string>
+	<string name="none_found">no device found</string>
+	<string name="title_paired_devices">Paired Devices:</string>
+	<string name="none_paired">No devices have been paired</string>
+	<string name="scanning">scanning for devices....</string>
+	
 </resources>

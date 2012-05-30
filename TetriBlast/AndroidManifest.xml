@@ -31,6 +31,12 @@
             android:name=".TetriBlastActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+        
+        <activity android:name=".DeviceListActivity"
+                  android:label="@string/select_device"
+                  android:screenOrientation="portrait"
+                  android:theme="@android:style/Theme.Dialog"
+                  android:configChanges="orientation|keyboardHidden" />
     
     </application>
 
