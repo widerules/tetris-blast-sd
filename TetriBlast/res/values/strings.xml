@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="ver_num">1.0</string>
+	<string name="ver_num">0.1.37</string>
     <string name="hello">Score: 192300</string>
     <string name="app_name">TetriBlast</string>
 	<string name="select_device">select a device from the list</string>
