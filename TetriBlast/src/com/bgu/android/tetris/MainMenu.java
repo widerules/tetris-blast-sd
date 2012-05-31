@@ -28,7 +28,7 @@ public class MainMenu extends Activity{
         singleBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intt = new Intent(me, TetriBlastActivity.class);
+				Intent intt = new Intent(me, NewGameActivity.class);
 				startActivity(intt);
 			}
 		});
@@ -38,6 +38,15 @@ public class MainMenu extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent intt = new Intent(me, ConnectionActivity.class);
+				startActivity(intt);
+			}
+		});
+        
+        manageBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intt = new Intent(me, ManageProfile.class);
 				startActivity(intt);
 			}
 		});
