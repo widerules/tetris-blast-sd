@@ -11,6 +11,8 @@ import android.widget.TextView;
 public class MainMenu extends Activity{
 	private final Activity me = this;
 	public static final String TAG = "TetrisBlast";
+	Profile profileDb = Profile.getInstance(this);
+	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
