@@ -17,6 +17,11 @@ import android.util.Log;
  */
 public class Profile {
 	//Constants
+	public static final int FALSE = 0;
+	public static final int TRUE = 1;
+	public static final int DEFAULT_DIFFICULT = 4;//Default difficult of the game
+	public static final int DEFAULT_SHADOW = TRUE;
+	public static final int DEFAULT_COOPERATIVE = FALSE;
 	public static final String MY_TAG = "TetrisBlast";
 	public static final String DB_NAME = "db_profiles.db";
 	public static final int DB_VERSION = 1;
@@ -26,8 +31,7 @@ public class Profile {
 	public static final String SCORE = "score";
 	public static final String SHADOW = "shadow";
 	public static final String COOPERATIVE = "cooperative";
-	public static final int FALSE = 0;
-	public static final int TRUE = 1;
+	
 	
 	private static HashMap<String, String> projectionMap; 
 	static 
@@ -43,7 +47,7 @@ public class Profile {
 	//Inner members
 	private static Profile instance = null;
 	private DBholder mDataBase = null;
-	public static final int DEFAULT_DIFFICULT = 4;//Default difficult of the game
+	
 	
 	private class DBholder extends SQLiteOpenHelper{
 
@@ -118,7 +122,7 @@ public class Profile {
 		return cc;
 	}
 	
-	public void addProfile(String name, String score, String difficulty, int shadow, int cooperative) {
+	public void addProfile(String name, String score, int difficulty, int shadow, int cooperative) {
 		ContentValues values = new ContentValues();
 		values.put(NAME, name);
 		values.put(SCORE, score);
