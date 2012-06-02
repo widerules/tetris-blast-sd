@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -72,15 +74,22 @@ public class ManageProfile extends ListActivity{
     @Override
     public void onStart() {
     	super.onStart();
+    	Cursor cur = profileDb.query();
+    	if(cur.getCount() == 0)
+    		showDialog(DIALOG_NEW_PROFILE);
         updateList();
     }
     
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
     	super.onListItemClick(l, v, position, id);
-    	Object o = this.getListAdapter().getItemId(position);
-    	String keyword = o.toString();
-    	Toast.makeText(this, "You selected: " + keyword, Toast.LENGTH_SHORT).show();
+    	SharedPreferences ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+    	SharedPreferences.Editor ed = ref.edit();
+		ed.putString(MainMenu.PROFILE_ID, Long.toString(id));
+		ed.putBoolean(MainMenu.HAVE_ACTIVE_PROFILE, true);
+		ed.commit();
+		this.finish();
+    	//Toast.makeText(this, "You selected: " + keyword, Toast.LENGTH_SHORT).show();
     }
     
     @Override
@@ -104,20 +113,42 @@ public class ManageProfile extends ListActivity{
     	newProfileDialog.setContentView(R.layout.dialog_new_profile);
     	newProfileDialog.setTitle(title);
     	
+    	newProfileDialog.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				Cursor cursor = profileDb.query();
+		    	if(cursor.getCount() != 0)
+		    		dialog.dismiss();
+		    	else {
+		    		me.showDialog(DIALOG_NEW_PROFILE);
+		    		Toast.makeText(me, "You must create a profile!", Toast.LENGTH_SHORT).show();
+		    	}
+		    		
+			}
+		});
+    	
     	Button createBtn = (Button) newProfileDialog.findViewById(R.id.btn_dialog_create);
     	createBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				EditText newName = (EditText) newProfileDialog.findViewById(R.id.edittxt_dialog_new_name);
-				if (newName.getText().length() > 0){
-					profileDb.addProfile(newName.getText().toString(), "0", 
-							Profile.DEFAULT_DIFFICULT, Profile.DEFAULT_SHADOW, Profile.DEFAULT_COOPERATIVE);
-					newProfileDialog.dismiss();
-					updateList();
+				String name = newName.getText().toString();
+				if (name.length() > 0){
+					Cursor cur = profileDb.queryByName(name);
+					if (cur.getCount() == 0) {
+						profileDb.addProfile(newName.getText().toString(), Profile.DEFAULT_SCORE, 
+								Profile.DEFAULT_DIFFICULT, Profile.toInt(Profile.DEFAULT_SHADOW), Profile.DEFAULT_GAME_TYPE);
+						newName.setText("");
+						newProfileDialog.cancel();
+						updateList();
+						
+					}else
+						Toast.makeText(me, "This name already exists", Toast.LENGTH_SHORT).show();
 				}	
 			}
 		});
+    	
     	return newProfileDialog;
 		
 	}
@@ -150,5 +181,6 @@ public class ManageProfile extends ListActivity{
 				new String[] {Profile.NAME, Profile.SCORE}, new int[] {R.id.entry_list_name, R.id.entry_list_score});
         setListAdapter(mAdapter);
 	}
+	
 }
 

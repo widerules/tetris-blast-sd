@@ -1,5 +1,20 @@
 package com.bgu.android.tetris;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.UUID;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+
 /**
  * This class does all the work for setting up and managing Bluetooth
  * connections with other devices. It has a thread that listens for
@@ -8,11 +23,10 @@ package com.bgu.android.tetris;
  */
 public class BluetoothMsgService {
 //    // Debugging
-//    private static final String TAG = "BluetoothChatService";
-//    private static final boolean D = true;
+//    private static final String TAG = "TetrisBlast";
 //
 //    // Name for the SDP record when creating server socket
-//    private static final String NAME = "BluetoothChat";
+//    private static final String NAME = "BluetoothTetris";
 //
 //    // Unique UUID for this application
 //    private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
@@ -47,7 +61,7 @@ public class BluetoothMsgService {
 //     * @param state  An integer defining the current connection state
 //     */
 //    private synchronized void setState(int state) {
-//        if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
+//        Log.d(TAG, "setState() " + mState + " -> " + state);
 //        mState = state;
 //
 //        // Give the new state to the Handler so the UI Activity can update

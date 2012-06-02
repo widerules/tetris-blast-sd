@@ -36,8 +36,7 @@
 	        android:paddingBottom="20dip"
 	        android:textSize="18sp"
 	        android:textStyle="italic"
-	        android:textColor="@color/menu_submenu"
-	        android:text="Hello, Denis" />
+	        android:textColor="@color/menu_submenu"/>
 	    <Button 
 	        android:id="@+id/btn_main_menu_single"
 	        android:layout_width="fill_parent"

@@ -10,4 +10,6 @@
 	<string name="scanning">scanning for devices....</string>
 	<string name="difficult">Difficult: </string>
 	<string name="profile">Profile: </string>
+	<string name="status_connected">Status: Connected</string>
+	<string name="status_disconnected">Status: Disconnected</string>
 </resources>
