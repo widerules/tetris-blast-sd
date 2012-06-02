@@ -28,7 +28,7 @@
         android:layout_gravity="left"
         android:paddingLeft="10dip"
         android:paddingBottom="20dip"
-        android:text="Profile: Denis"
+        android:text="Profile: "
         android:textColor="@color/menu_submenu"
         android:textSize="18sp"
         />
@@ -93,12 +93,15 @@
         android:layout_width="fill_parent"
         android:layout_height="0.5dip"
         android:background="#999"/>
-	<RelativeLayout        
+	
+	<RelativeLayout
+	    android:id="@+id/new_game_multi_mode"
         android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_gravity="center_vertical"
 	    android:layout_marginTop="10dip"
-	    android:layout_marginBottom="10dip">
+	    android:layout_marginBottom="10dip"
+	    android:visibility="gone">
 	    
 	    <TextView
 	        android:id="@+id/txt_newgame_cooperative"
@@ -120,10 +123,7 @@
 	        android:paddingRight="20dip"/>
 	   
     </RelativeLayout>
-    <TextView 
-        android:layout_width="fill_parent"
-        android:layout_height="0.5dip"
-        android:background="#999"/>
+    
 	
     <LinearLayout 
         android:layout_width="fill_parent"
@@ -158,5 +158,6 @@
 	        android:layout_alignParentBottom="true"
 	        android:textSize="18sp"
 	        android:textColor="@color/green_ok"
+	        android:visibility="gone"
 	        android:text="Status: Connected" />
 </RelativeLayout>

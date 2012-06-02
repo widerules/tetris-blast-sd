@@ -1,6 +1,8 @@
 package com.bgu.android.tetris;
 
 import java.util.HashMap;
+
+import android.R.bool;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,11 +19,11 @@ import android.util.Log;
  */
 public class Profile {
 	//Constants
-	public static final int FALSE = 0;
-	public static final int TRUE = 1;
+	public static final long DEFAULT_SCORE = 0;
 	public static final int DEFAULT_DIFFICULT = 4;//Default difficult of the game
-	public static final int DEFAULT_SHADOW = TRUE;
-	public static final int DEFAULT_COOPERATIVE = FALSE;
+	public static final String DEFAULT_PROFILE_NAME = "Player 1";
+	public static final boolean DEFAULT_SHADOW = true;
+	public static final int DEFAULT_GAME_TYPE = MainMenu.MODE_UNDEFINED;
 	public static final String MY_TAG = "TetrisBlast";
 	public static final String DB_NAME = "db_profiles.db";
 	public static final int DB_VERSION = 1;
@@ -30,8 +32,13 @@ public class Profile {
 	public static final String DIFFICULTY = "difficulty";
 	public static final String SCORE = "score";
 	public static final String SHADOW = "shadow";
-	public static final String COOPERATIVE = "cooperative";
-	
+		
+	//Active profile
+	private String name;
+	private int difficulty;
+	private long score;
+	private boolean shadow;
+	private int gameMode;
 	
 	private static HashMap<String, String> projectionMap; 
 	static 
@@ -42,7 +49,7 @@ public class Profile {
 		projectionMap.put(SCORE, SCORE); 
 		projectionMap.put(DIFFICULTY, DIFFICULTY);
 		projectionMap.put(SHADOW, SHADOW);
-		projectionMap.put(COOPERATIVE, COOPERATIVE);
+		projectionMap.put(MainMenu.GAME_MODE, MainMenu.GAME_MODE);
 	} 
 	//Inner members
 	private static Profile instance = null;
@@ -62,10 +69,10 @@ public class Profile {
 			String sqlOpp = "CREATE TABLE " + DB_TABLE_NAME + " ( " 
 					+ "_id" + " INTEGER PRIMARY KEY, "
 					+ NAME + " TEXT, " 
-					+ SCORE + " TEXT, " 
+					+ SCORE + " INTEGER, " 
 					+ DIFFICULTY + " INTEGER,"
 					+ SHADOW + " INTEGER,"
-					+ COOPERATIVE + " INTEGER "
+					+ MainMenu.GAME_MODE + " INTEGER "
 					+ ");";
 			db.execSQL(sqlOpp);
 			Log.d(MY_TAG,"DataBase created!");
@@ -114,7 +121,7 @@ public class Profile {
 	
 	public Cursor queryById(String id) {
 		SQLiteDatabase db = mDataBase.getReadableDatabase(); 
-		String[] coloms = {"_id", NAME, SCORE, DIFFICULTY, SHADOW, COOPERATIVE};
+		String[] coloms = {"_id", NAME, SCORE, DIFFICULTY, SHADOW, MainMenu.GAME_MODE};
 		String selection = "_id" + "=?";
 		String[] args = {id};
 		Cursor cc = null;
@@ -122,13 +129,24 @@ public class Profile {
 		return cc;
 	}
 	
-	public void addProfile(String name, String score, int difficulty, int shadow, int cooperative) {
+	public Cursor queryByName(String name) {
+		SQLiteDatabase db = mDataBase.getReadableDatabase(); 
+		String[] coloms = {"_id", NAME};
+		String selection = NAME + "=?";
+		String[] args = {name};
+		Cursor cc = null;
+		cc = db.query(DB_TABLE_NAME, coloms, selection, args, null, null, null);
+		return cc;
+		
+	}
+	
+	public void addProfile(String name, long score, int difficulty, int shadow, int gameMode) {
 		ContentValues values = new ContentValues();
 		values.put(NAME, name);
 		values.put(SCORE, score);
 		values.put(DIFFICULTY, difficulty);
 		values.put(SHADOW, shadow);
-		values.put(COOPERATIVE, cooperative);
+		values.put(MainMenu.GAME_MODE, gameMode);
 		SQLiteDatabase db = mDataBase.getWritableDatabase(); 
 		long rowId = db.insert(DB_TABLE_NAME, NAME, values); 
 		if (rowId <= 0) throw new SQLException("Failed to insert row into table " );
@@ -139,5 +157,108 @@ public class Profile {
 		SQLiteDatabase db = mDataBase.getWritableDatabase();
 		db.delete(DB_TABLE_NAME, "_id" + "=?", new String[] {id});
 		Log.d(MY_TAG, "Profile _id " + id + " deleted from " + DB_TABLE_NAME);
+	}
+	
+	public void loadProfileById(String id) {
+		Cursor cur = queryById(id);
+		cur.moveToFirst();
+		if (cur.getCount()== 0) {
+			name = DEFAULT_PROFILE_NAME;
+			difficulty = DEFAULT_DIFFICULT;
+			score = DEFAULT_SCORE;
+			shadow = DEFAULT_SHADOW;
+			gameMode = DEFAULT_GAME_TYPE;
+		}
+		else {
+			name = cur.getString(cur.getColumnIndex(NAME));
+			difficulty = cur.getInt(cur.getColumnIndex(DIFFICULTY));
+			score = cur.getLong(cur.getColumnIndex(SCORE));
+			if(cur.getInt(cur.getColumnIndex(SHADOW))== 0) 
+				shadow = false;
+			else
+				shadow = true;
+			gameMode = cur.getInt(cur.getColumnIndex(MainMenu.GAME_MODE)); 
+		}
+	}
+	
+	public int updateProfileById(String id, String name, long score, int difficulty, int shadow, int gameMode) {
+		ContentValues values = new ContentValues();
+		values.put(NAME, name);
+		values.put(SCORE, score);
+		values.put(DIFFICULTY, difficulty);
+		values.put(SHADOW, shadow);
+		values.put(MainMenu.GAME_MODE, gameMode);
+		SQLiteDatabase db = mDataBase.getWritableDatabase();
+		String selection = "_id" + "=?";
+		String[] args = {id};
+		return db.update(DB_TABLE_NAME, values, selection, args);
+	}
+	/**
+	 * Save Profile
+	 * @return false if cant find ID
+	 */
+	public boolean saveProfileById(String id) {
+		if (updateProfileById(id, name, score, difficulty, toInt(shadow), gameMode) == 0)
+			return false;
+		return true;
+	}
+	public static int toInt(boolean bool) {
+		if(bool) return 1;
+		return 0;
+	}
+	public static boolean toBool(int inte)
+	{
+		if (inte != 0) return true;
+		return false;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
+	}
+
+
+	public long getScore() {
+		return score;
+	}
+
+
+	public void setScore(long score) {
+		this.score = score;
+	}
+
+
+	public boolean isShadow() {
+		return shadow;
+	}
+
+
+	public void setShadow(boolean shadow) {
+		this.shadow = shadow;
+	}
+
+
+	public int getGameMode() {
+		return gameMode;
+	}
+
+
+	public void setGameMode(int gameMode) {
+		this.gameMode = gameMode;
 	}
 }

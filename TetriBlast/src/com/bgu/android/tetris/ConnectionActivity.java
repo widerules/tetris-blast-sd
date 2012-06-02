@@ -4,6 +4,7 @@ package com.bgu.android.tetris;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -49,7 +50,11 @@ public class ConnectionActivity extends Activity {
 					startActivityForResult(discoverableIntent, REQUEST_DISCOVER_DEVICE);
 				}
 				else {
-					Intent intt = new Intent(me, TetriBlastActivity.class);
+					SharedPreferences ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+					SharedPreferences.Editor ed = ref.edit();
+					ed.putInt(MainMenu.GAME_MODE, MainMenu.MODE_MULTY);
+					ed.commit();
+					Intent intt = new Intent(me, NewGameActivity.class);
 					startActivity(intt);
 				}
 			    
@@ -84,7 +89,11 @@ public class ConnectionActivity extends Activity {
         case REQUEST_DISCOVER_DEVICE:
           	// When the request to enable Bluetooth returns
             if (resultCode != 0) {
-            	Intent intt = new Intent(me, TetriBlastActivity.class);
+            	SharedPreferences ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+				SharedPreferences.Editor ed = ref.edit();
+				ed.putInt(MainMenu.GAME_MODE, MainMenu.MODE_MULTY);
+				ed.commit();
+            	Intent intt = new Intent(me, NewGameActivity.class);
 				startActivity(intt);
             } else {
                 // User did not enable Bluetooth or an error occured
