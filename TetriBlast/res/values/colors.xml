@@ -6,4 +6,5 @@
     <color name="red_no_connect">#ff0000</color>
     <color name="grey">#cccccc</color>
     <color name="black">#000000</color>
+    <color name="bg_2">#112132</color>
 </resources>

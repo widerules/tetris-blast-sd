@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="General Settings">
+        <CheckBoxPreference
+            android:title="Music"
+            android:key="music_on"
+            android:summary="Turn music on"
+            android:defaultValue="true"
+            />
+        <CheckBoxPreference
+            android:title="Sound Effects"
+            android:key="sound_on"
+            android:summary="Turn sound effects on"
+            android:defaultValue="true"
+            />
+    </PreferenceCategory>
+	<PreferenceCategory android:title="Game Settings">
+	    <ListPreference
+	        android:defaultValue="0"
+	        android:entries="@array/block_sens_arr"
+	        android:entryValues="@array/block_sens_val"
+	        android:key="sens_list"
+	        android:summary="Adjust block moving sensativity"
+	        android:title="Moving Sensativity"/>
+	    </PreferenceCategory>
+
+</PreferenceScreen>
