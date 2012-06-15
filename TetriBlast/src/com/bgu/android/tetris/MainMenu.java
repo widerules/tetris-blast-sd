@@ -1,12 +1,13 @@
 package com.bgu.android.tetris;
 
-import java.util.EmptyStackException;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -38,9 +39,6 @@ public class MainMenu extends Activity{
         Button singleBtn = (Button)findViewById(R.id.btn_main_menu_single);
         Button multiBtn = (Button)findViewById(R.id.btn_main_menu_multi);
         Button manageBtn = (Button)findViewById(R.id.btn_main_menu_manage);
-        Button settingBtn = (Button)findViewById(R.id.btn_main_menu_settings);
-        Button leaderBtn = (Button)findViewById(R.id.btn_main_menu_leader);
-        Button helpBtn = (Button)findViewById(R.id.btn_main_menu_help);
         TextView verTxt = (TextView)findViewById(R.id.txt_main_menu_ver);
         verTxt.setText(verTxt.getText().toString() + getString(R.string.ver_num));
         //Button Listenerses
@@ -78,6 +76,26 @@ public class MainMenu extends Activity{
 		});
     }
     
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	super.onCreateOptionsMenu(menu);
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.main_menu, menu);
+    	return true;
+    }
+    
+    public boolean onOptionsItemSelected(MenuItem item){
+    	Intent intt;
+    	switch (item.getItemId()) {
+		case R.id.main_menu_settings:
+			intt = new Intent(this, Settings.class);
+			startActivity(intt);
+			return true;
+		default:
+			break;
+		}
+    	return super.onContextItemSelected(item);
+    }
     @Override
     public void onStart() {
     	super.onStart();
