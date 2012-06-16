@@ -1,11 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    <com.bgu.android.tetris.MainMap
-	 android:id="@+id/tetris"
-	 android:layout_width="match_parent"
-     android:layout_height="match_parent"/>
-
-</LinearLayout>
+    android:background="@drawable/tetris_bg2">
+         <ImageView 
+             android:layout_width="320px"
+             android:layout_height="50px"
+             android:src="@drawable/banner"
+             android:layout_alignParentTop="true"
+             android:layout_centerHorizontal="true"
+             android:visibility="gone"/>
+         <LinearLayout 
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:layout_alignParentTop="true"
+             android:orientation="vertical">
+             
+             <LinearLayout 
+                android:layout_width="fill_parent"
+             	android:layout_height="wrap_content"
+             	android:orientation="horizontal">
+	             <TextView 
+	                 android:layout_width="wrap_content"
+	                 android:layout_height="wrap_content"
+	                 android:paddingTop="10dip"
+	                 android:paddingLeft="10dip"
+	                 android:paddingRight="10dip"
+	                 android:textSize="22sp"
+	                 android:text="Score: "/>
+	             <TextView 
+	                 android:layout_width="wrap_content"
+	                 android:layout_height="wrap_content"
+	                 android:paddingTop="10dip"
+	                 android:textSize="22sp"
+	                 android:text="124563"/>
+	         </LinearLayout>
+	         <RelativeLayout 
+	            android:layout_width="fill_parent"
+             	android:layout_height="wrap_content">
+	            <TextView 
+	                 android:layout_width="wrap_content"
+	                 android:layout_height="wrap_content"
+	                 android:layout_alignParentLeft="true"
+	                 android:paddingLeft="20dip"
+	                 android:textSize="22sp"
+	                 android:text="Denis"/>
+	            <ImageView
+	                android:layout_width="40dp"
+	                android:layout_height="30dp"
+	                android:layout_centerHorizontal="true" 
+	                android:src="@drawable/vs_logo"/>
+	            <TextView 
+	                 android:layout_width="wrap_content"
+	                 android:layout_height="wrap_content"
+	                 android:layout_alignParentRight="true"
+	                 android:textSize="22sp"
+	                 android:paddingRight="20dip"
+	                 android:text="Ran"/> 
+	         </RelativeLayout>
+	     </LinearLayout>
+	 <LinearLayout
+	     android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:orientation="vertical"
+	     android:paddingTop="290px"
+	     android:layout_alignParentRight="true" >
+	         <TextView 
+	             android:layout_width="wrap_content"
+	     		 android:layout_height="wrap_content"
+	     		 android:textSize="11.5sp"
+	     		 android:text="Combo Chain:"/>
+	         <TextView 
+	             android:layout_width="wrap_content"
+	     		 android:layout_height="wrap_content"
+	     		 android:textSize="18sp"
+	     		 android:layout_gravity="center_horizontal"
+	     		 android:text="x5"/>
+	 </LinearLayout>  
+     <com.bgu.android.tetris.MainMap
+         android:id="@+id/tetris"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent" />
+</RelativeLayout>

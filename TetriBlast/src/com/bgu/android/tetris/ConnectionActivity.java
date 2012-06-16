@@ -71,10 +71,10 @@ public class ConnectionActivity extends Activity {
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
-                if (readMessage == "start") {
+                if (readMessage.equals("start")) {//TODO change to constant
                 	me.mProgresDialog.dismiss();
                 	Toast.makeText(me, "Host started a game", Toast.LENGTH_SHORT);
-                	Intent intt = new Intent(me, NewGameActivity.class);
+                	Intent intt = new Intent(me, TetriBlastActivity.class);
 					startActivity(intt);
                 }
                 break;
