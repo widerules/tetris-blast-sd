@@ -41,8 +41,9 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
                 switch (msg.arg1) {
                 case BluetoothConnectivity.STATE_CONNECTED:
                 	showStatus();
+                	startBtn.setEnabled(true);
                 	Toast.makeText(me, "Remote Device Connected!", Toast.LENGTH_SHORT);
-                    break;
+                	break;
                 case BluetoothConnectivity.STATE_CONNECTING:
                 	Toast.makeText(me, "Connecting...", Toast.LENGTH_SHORT);
                     break;
@@ -108,6 +109,9 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 			@Override
 			public void onClick(View v) {
 				saveActivitySettings();
+				String msgStart = "start";//TODO change to constant
+            	byte[] msgSend = msgStart.getBytes();
+            	mBluetoothCon.write(msgSend);
 				Intent intt = new Intent(me, TetriBlastActivity.class);
 				startActivity(intt);
 				}    
@@ -135,6 +139,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         case MainMenu.MODE_MULTY:
         	multiLayout.setVisibility(View.VISIBLE);
         	statusTxt.setVisibility(View.VISIBLE);
+        	startBtn.setEnabled(false);
         	showStatus();
         	boolean temp;
         	if (profileDb.getGameMode() == MainMenu.MODE_COOP)

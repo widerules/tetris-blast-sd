@@ -73,7 +73,7 @@ public class ConnectionActivity extends Activity {
                 //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
                 if (readMessage == "start") {
                 	me.mProgresDialog.dismiss();
-                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
+                	Toast.makeText(me, "Host started a game", Toast.LENGTH_SHORT);
                 	Intent intt = new Intent(me, NewGameActivity.class);
 					startActivity(intt);
                 }
