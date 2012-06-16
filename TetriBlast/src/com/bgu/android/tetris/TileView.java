@@ -43,6 +43,8 @@ public class TileView extends View {
 
     protected static int mXOffset;
     protected static int mYOffset;
+    protected static final int NEXT_PIC_X = 370;
+    protected static final int NEXT_PIC_Y = 170;
 
 
     /**
@@ -117,8 +119,8 @@ public class TileView extends View {
     protected void calculateTileSize(int w, int h) {
     	Log.d(TAG, "OnSize changed, w = " + Integer.toString(w)+"h = " + Integer.toString(h));
     	mTileSize = (int)Math.floor((w*mXRatio)/mXTileCount);
-        mXOffset = mTileSize;
-        mYOffset = ((h - (mTileSize * mYTileCount)) / 2);
+        mXOffset = (int)(mTileSize*1.33);
+        mYOffset = mTileSize*5;
         
     }
 
@@ -184,7 +186,7 @@ public class TileView extends View {
                 }
             }
         }
-        canvas.drawBitmap(mNextTetrinoArr[mCurNext], 370, 140, mPaint);
+        canvas.drawBitmap(mNextTetrinoArr[mCurNext], NEXT_PIC_X, NEXT_PIC_Y, mPaint);
     }
 
 }
