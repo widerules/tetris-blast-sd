@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingTop="10dip"
+        android:paddingTop="15dip"
         android:paddingBottom="15dip"
         android:text="Manage Profiles"
         android:textColor="@color/menu_title"

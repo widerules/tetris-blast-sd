@@ -1,11 +1,14 @@
 package com.bgu.android.tetris;
 
-
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,19 +16,81 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class ConnectionActivity extends Activity {
-	final Activity me = this;
+	final ConnectionActivity me = this;
 	public static final String TAG = "TetrisBlast";
     
 	 // Intent request codes
     private static final int REQUEST_DISCOVER_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
+    private static final int REQUEST_JOIN_DEVICE = 3;
     
     
     // Member object for the chat services
-    private BluetoothMsgService mChatService = null;
+    private BluetoothConnectivity mBTconnection = null;
     
 	// Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
+    
+    public ProgressDialog mProgresDialog;
+    
+    // Name of the connected device
+    private String mConnectedDeviceName = null;
+    
+    // The Handler that gets information back from the BluetoothConnectivity
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case BluetoothConnectivity.MESSAGE_STATE_CHANGE:
+                Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                switch (msg.arg1) {
+                case BluetoothConnectivity.STATE_CONNECTED:
+                	me.mProgresDialog.dismiss();
+                	me.mProgresDialog = ProgressDialog.show(me, "Device Conected!", "Whaiting for Host start a game");
+                	
+//                	Intent intt = new Intent(me, NewGameActivity.class);
+//					startActivity(intt);
+                    break;
+                case BluetoothConnectivity.STATE_CONNECTING:
+                	Toast.makeText(me, "Connecting...", Toast.LENGTH_SHORT);
+                    break;
+                case BluetoothConnectivity.STATE_LISTEN:
+                case BluetoothConnectivity.STATE_NONE:
+                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
+                    break;
+                }
+                break;
+//            case MESSAGE_WRITE:
+//                byte[] writeBuf = (byte[]) msg.obj;
+//                // construct a string from the buffer
+//                String writeMessage = new String(writeBuf);
+//                mConversationArrayAdapter.add("Me:  " + writeMessage);
+//                break;
+            case BluetoothConnectivity.MESSAGE_READ:
+                byte[] readBuf = (byte[]) msg.obj;
+                // construct a string from the valid bytes in the buffer
+                String readMessage = new String(readBuf, 0, msg.arg1);
+                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                if (readMessage == "start") {
+                	me.mProgresDialog.dismiss();
+                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
+                	Intent intt = new Intent(me, NewGameActivity.class);
+					startActivity(intt);
+                }
+                break;
+            case BluetoothConnectivity.MESSAGE_DEVICE_NAME:
+                // save the connected device's name
+                mConnectedDeviceName = msg.getData().getString(BluetoothConnectivity.DEVICE_NAME);
+                Toast.makeText(getApplicationContext(), "Connected to "
+                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                break;
+            case BluetoothConnectivity.MESSAGE_TOAST:
+                Toast.makeText(getApplicationContext(), msg.getData().getString(BluetoothConnectivity.TOAST),
+                               Toast.LENGTH_SHORT).show();
+                break;
+            }
+        }
+    };
     
 	/** Called when the activity is first created. */
     @Override
@@ -66,9 +131,12 @@ public class ConnectionActivity extends Activity {
 			public void onClick(View v) {
 				// Launch the DeviceListActivity to see devices and do scan
 	            Intent serverIntent = new Intent(me, DeviceListActivity.class);
-	            startActivityForResult(serverIntent, REQUEST_DISCOVER_DEVICE);
+	            startActivityForResult(serverIntent, REQUEST_JOIN_DEVICE);
 			}
 		});
+        //Get Bluetooth Connectivity singleton 
+        mBTconnection = BluetoothConnectivity.getInstance(me);
+        mBTconnection.setHandler(mHandler);
         
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -105,12 +173,25 @@ public class ConnectionActivity extends Activity {
             // When the request to enable Bluetooth returns
             if (resultCode == Activity.RESULT_OK) {
                 // Bluetooth is now enabled, so set up a chat session
-                setupChat();
+            	//TODO check BT enabled flag
+                //me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
             } else {
                 // User did not enable Bluetooth or an error occured
                 Log.d(TAG, "BT not enabled");
                 Toast.makeText(this, "BT not enabled" , Toast.LENGTH_SHORT).show();
             }
+            break;
+        case REQUEST_JOIN_DEVICE:
+        	if(resultCode == Activity.RESULT_OK) {//TODO add checking BT enabled flag
+        		// Get the device MAC address
+                String address = data.getExtras()
+                    .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                // Get the BLuetoothDevice object
+                BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+                // Attempt to connect to the device
+        		mBTconnection.connect(device);
+        		me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
+        	}
         }
     }
     @Override
@@ -123,7 +204,8 @@ public class ConnectionActivity extends Activity {
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         // Otherwise, setup the chat session
         } else {
-            if (mChatService == null) setupChat();
+        	//setupChat();
+            //TODO chesk thisif (mChatService == null) setupChat();
         }
     }
 
@@ -137,13 +219,13 @@ public class ConnectionActivity extends Activity {
     	super.onStop();
     }
     
-    private void setupChat() {
-        Log.d(TAG, "setupChat()");
-
-        //sendMessage(message);
-        
-        // Initialize the BluetoothChatService to perform bluetooth connections
-        //mChatService = new BluetoothMsgService(this, mHandler);
-    }
+//    private void setupChat() {
+//        Log.d(TAG, "setupChat()");
+//
+//        //sendMessage(message);
+//        
+//        // Initialize the BluetoothChatService to perform bluetooth connections
+//        //mChatService = new BluetoothMsgService(this, mHandler);
+//    }
 
 }
