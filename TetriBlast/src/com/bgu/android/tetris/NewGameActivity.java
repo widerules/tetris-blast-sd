@@ -1,14 +1,12 @@
 package com.bgu.android.tetris;
 
-import com.bgu.android.tetris.R.color;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -16,24 +14,86 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
-	final Activity me = this;
+	protected static final String TAG = MainMenu.TAG;
+	final NewGameActivity me = this;
 	protected Profile profileDb = Profile.getInstance(this);
-	TextView profileName;
-	SeekBar diffLevel;
-	TextView diffTxt;
-	CheckBox shadowChk;
-	CheckBox coopChk;//TODO denis need to change it to radio buttons!!!
-	Button startBtn;
-	TextView statusTxt;
-	RelativeLayout multiLayout;
-	SharedPreferences ref;
+	private TextView profileName;
+	private SeekBar diffLevel;
+	private TextView diffTxt;
+	private CheckBox shadowChk;
+	private CheckBox coopChk;//TODO denis need to change it to radio buttons!!!
+	private Button startBtn;
+	private TextView statusTxt;
+	private RelativeLayout multiLayout;
+	private SharedPreferences ref;
+	protected BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);;
+	
+	// The Handler that gets information back from the BluetoothConnectivity
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case BluetoothConnectivity.MESSAGE_STATE_CHANGE:
+                Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                switch (msg.arg1) {
+                case BluetoothConnectivity.STATE_CONNECTED:
+                	showStatus();
+                	Toast.makeText(me, "Remote Device Connected!", Toast.LENGTH_SHORT);
+                    break;
+                case BluetoothConnectivity.STATE_CONNECTING:
+                	Toast.makeText(me, "Connecting...", Toast.LENGTH_SHORT);
+                    break;
+                case BluetoothConnectivity.STATE_LISTEN:
+                	showStatus();
+                	Toast.makeText(me, "Listening to remote device connection...", Toast.LENGTH_SHORT);
+                    break;
+                case BluetoothConnectivity.STATE_NONE:
+                	showStatus();
+                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
+                    break;
+                }
+                break;
+//            case MESSAGE_WRITE:
+//                byte[] writeBuf = (byte[]) msg.obj;
+//                // construct a string from the buffer
+//                String writeMessage = new String(writeBuf);
+//                mConversationArrayAdapter.add("Me:  " + writeMessage);
+//                break;
+//            case BluetoothConnectivity.MESSAGE_READ:
+//                byte[] readBuf = (byte[]) msg.obj;
+//                // construct a string from the valid bytes in the buffer
+//                String readMessage = new String(readBuf, 0, msg.arg1);
+//                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+//                if (readMessage == "start") {
+//                	me.mProgresDialog.dismiss();
+//                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
+//                	Intent intt = new Intent(me, NewGameActivity.class);
+//					startActivity(intt);
+//                }
+//                break;
+//            case BluetoothConnectivity.MESSAGE_DEVICE_NAME:
+//                // save the connected device's name
+//                mConnectedDeviceName = msg.getData().getString(BluetoothConnectivity.DEVICE_NAME);
+//                Toast.makeText(getApplicationContext(), "Connected to "
+//                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+//                break;
+//            case BluetoothConnectivity.MESSAGE_TOAST:
+//                Toast.makeText(getApplicationContext(), msg.getData().getString(BluetoothConnectivity.TOAST),
+//                               Toast.LENGTH_SHORT).show();
+//                break;
+            }
+        }
+    };
+	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_game);
+        mBluetoothCon.setHandler(mHandler);
         startBtn = (Button)findViewById(R.id.btn_newgame_start);
         diffLevel = (SeekBar)findViewById(R.id.seekb_newgame_difficulty);
         diffLevel.setOnSeekBarChangeListener(this);
@@ -43,7 +103,8 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
     	coopChk = (CheckBox)findViewById(R.id.checkbox_newgame_cooperative);
     	statusTxt = (TextView)findViewById(R.id.txt_start_status);
     	multiLayout = (RelativeLayout)findViewById(R.id.new_game_multi_mode);
-        startBtn.setOnClickListener(new OnClickListener() {
+        
+    	startBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				saveActivitySettings();
@@ -74,16 +135,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         case MainMenu.MODE_MULTY:
         	multiLayout.setVisibility(View.VISIBLE);
         	statusTxt.setVisibility(View.VISIBLE);
-        	if (isConnected())
-        	{
-        		statusTxt.setText(R.string.status_connected);
-        		statusTxt.setTextColor(getResources().getColor(R.color.green_ok));
-        	}
-        	else
-        	{
-        		statusTxt.setText(R.string.status_disconnected);
-        		statusTxt.setTextColor(getResources().getColor(R.color.red_no_connect));
-        	}
+        	showStatus();
         	boolean temp;
         	if (profileDb.getGameMode() == MainMenu.MODE_COOP)
         		temp =true;
@@ -94,7 +146,22 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         default:
         	break;
         }
+        //Start Listening on Bluetooth connection
+        mBluetoothCon.startListen();
     }
+	private void showStatus() {
+		if (mBluetoothCon.getState() == BluetoothConnectivity.STATE_CONNECTED)
+    	{
+    		statusTxt.setText(R.string.status_connected);
+    		statusTxt.setTextColor(getResources().getColor(R.color.green_ok));
+    	}
+    	else
+    	{
+    		statusTxt.setText(R.string.status_disconnected);
+    		statusTxt.setTextColor(getResources().getColor(R.color.red_no_connect));
+    	}
+		
+	}
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress,
 			boolean fromUser) {
@@ -128,13 +195,5 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 				|| ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED)==MainMenu.MODE_VS)
 			profileDb.setGameMode(temp);
 		profileDb.saveProfileById(ref.getString(MainMenu.PROFILE_ID, null));
-	}
-	/*
-	 * TODO denis plz do it
-	 * NEED TO CHECK IF I AM CONNECTED TO BLUETOOTH
-	 */
-	private boolean isConnected()
-	{
-		return true;
 	}
 }
