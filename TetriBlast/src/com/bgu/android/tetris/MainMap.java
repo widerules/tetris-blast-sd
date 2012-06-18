@@ -70,7 +70,7 @@ public class MainMap extends TileView{
 	/**
 	 * X move sensitivity
 	 */
-	private static final int xMoveSens = 20;
+	private static final int xMoveSens = 30;
 	
 	/**
 	 * Rotate sensitivity
@@ -79,7 +79,7 @@ public class MainMap extends TileView{
 	/**
 	 * Drop down sensitivity
 	 */
-	private static final int dropSensativity = 30;//~30*3.5
+	private static final int dropSensativity = 50;//~30*3.5
 	public static final int READY = 1;
 	public static final int PAUSE = 0;
 	
@@ -444,6 +444,9 @@ public class MainMap extends TileView{
 		
 	}
 
-
+	public void increaseLines(int lines)
+	{
+		mapCur.addLines(lines);
+	}
 	    
 }

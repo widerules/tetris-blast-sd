@@ -66,6 +66,7 @@ public class TetriBlastActivity extends Activity {
                 increaseScore(msg.arg1);
                 if (mGameMode == MainMenu.MODE_VS || mGameMode == MainMenu.MODE_COOP)
                 	increaseLinesToSend(msg.arg1);
+                incraseLineToIncrease();
                 break;
             case MSG_END_GAME:
             	Log.i(TAG, "GAME OVER!");
@@ -74,6 +75,13 @@ public class TetriBlastActivity extends Activity {
 
             }
         }
+
+		private void incraseLineToIncrease() {
+			if (mLinesToIncrease!=0)
+				mMainMapView.increaseLines(mLinesToIncrease);
+			mLinesToIncrease=0;
+			
+		}
 
 		
     };
@@ -109,7 +117,7 @@ public class TetriBlastActivity extends Activity {
         linesToSend = 0;
         mCombo = 1;
         mTotalLinesSent = 0;
-        
+        mLinesToIncrease = 2;
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	mMainMapView.setMode(MainMap.READY);
