@@ -83,6 +83,7 @@ public class MainMap extends TileView{
 	public static final int READY = 1;
 	public static final int PAUSE = 0;
 	
+	private Handler mActivityHandler;
 	
 	private class RefreshHandler extends Handler {
 
@@ -91,8 +92,9 @@ public class MainMap extends TileView{
 			if(mGameState == READY) {
 				if(msg.what == 1) {//TODO change to final Name
 					mapCur.copyFrom(mapLast);
-					int i = mapCur.lineCheckAndClear();
+					int linesCleared = mapCur.lineCheckAndClear();
 					//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
+					mActivityHandler.obtainMessage(TetriBlastActivity.MSG_LINES_CLEARED, linesCleared, -1).sendToTarget();
 					mapOld.copyFrom(mapCur);
 					
 					curTetrino = newTetrino(getRandomFromArr(), 4, 0);//TODO check this
@@ -120,13 +122,15 @@ public class MainMap extends TileView{
 			//mGameState = true;
 		}
 
+		
+
 		public void sleep(long delayMillis) {
 			this.removeMessages(0);
 			sendEmptyMessageDelayed(0, delayMillis);
 			//sendMessageDelayed(obtainMessage(0), delayMillis);
 		}
 	};
-
+	
 
 	/**
 	 * Constructs a MainMap View based on inflation from XML
@@ -433,6 +437,11 @@ public class MainMap extends TileView{
 	public void setMode(int state) {
 		// TODO Auto-generated method stub
 		mGameState = state;
+	}
+
+	public void setActivityHandler(Handler mHandler) {
+		mActivityHandler = mHandler;// TODO Auto-generated method stub
+		
 	}
 
 
