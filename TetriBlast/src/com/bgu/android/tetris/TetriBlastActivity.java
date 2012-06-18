@@ -2,6 +2,7 @@ package com.bgu.android.tetris;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,6 +35,7 @@ public class TetriBlastActivity extends Activity {
     
     private SharedPreferences ref;
     private BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);
+    private Profile profileDb = Profile.getInstance(this);
     
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
     private long mCurrentScore;	//Curent score of the player
@@ -42,7 +44,19 @@ public class TetriBlastActivity extends Activity {
     private int mCombo;			//Combo score multiplier
     private int mLinesToIncrease;//Num of score to increase
     
- // The Handler that gets information back from the BluetoothConnectivity
+    // The Handler that gets information back from the BluetoothConnectivity
+    private final Handler mBtHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+            case BluetoothConnectivity.MESSAGE_WRITE:
+            	//TODO update name of opponet here
+            	break;
+            }
+        }
+    };
+    
+    // The Handler that gets information back from the MainMap class
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -84,6 +98,12 @@ public class TetriBlastActivity extends Activity {
         mGameMode = ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED);
         if (mGameMode == MainMenu.MODE_SINGLE) {
         	mNameLine.setVisibility(View.GONE);
+        }
+        else {
+        	Cursor cursor = profileDb.queryById(ref.getString(MainMenu.PROFILE_ID, null));
+    		cursor.moveToFirst();
+    		String name = cursor.getString(cursor.getColumnIndex(Profile.NAME));
+        	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
         }
         mCurrentScore = 0;
         linesToSend = 0;

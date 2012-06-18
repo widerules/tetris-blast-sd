@@ -39,6 +39,14 @@ public class BluetoothConnectivity {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
     
+    // Bluetooth messages types
+    public static final int TYPE_LINES = 1;
+    public static final int TYPE_SCORE = 2;
+    public static final int TYPE_START = 3;
+    public static final int TYPE_GAME_STATE = 4;
+    public static final int TYPE_WIN_LOSS = 5;
+    public static final int TYPE_NAME = 6;
+    
 	private static BluetoothConnectivity instance = null;
 	private final BluetoothAdapter mAdapter;
 	private Handler mHandler;
@@ -193,7 +201,7 @@ public class BluetoothConnectivity {
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public void write(byte[] out) {
+    public void write(int type, byte[] data) {
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
@@ -201,8 +209,19 @@ public class BluetoothConnectivity {
             if (mState != STATE_CONNECTED) return;
             r = mConnectedThread;
         }
-        // Perform the write unsynchronized
-        r.write(out);
+        byte[] out;
+        if (data != null){
+        	out = new byte[data.length + 1];
+        	out[0] = (byte)type;
+        	for(int i = 0; i < data.length; i++)
+        		out[i+1] = data[i];
+        }
+        else {
+        	out = new byte[1];
+        	out[0] = (byte)type;
+        	r.write(out);
+        }
+        r.write(out);// Perform the write unsynchronized
     }
     
     /**
@@ -393,7 +412,7 @@ public class BluetoothConnectivity {
                     bytes = mmInStream.read(buffer);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, bytes, -1, buffer)
+                    mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, bytes, (int)buffer[0], buffer)
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
