@@ -446,7 +446,7 @@ public class MainMap extends TileView{
 
 	public void increaseLines(int lines)
 	{
-		mapCur.addLines(lines);
+		mapOld.addLines(lines);
 	}
 	    
 }
