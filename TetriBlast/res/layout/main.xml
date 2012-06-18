@@ -29,16 +29,18 @@
 	                 android:paddingRight="10dip"
 	                 android:textSize="22sp"
 	                 android:text="Score: "/>
-	             <TextView 
+	             <TextView
+	                 android:id="@+id/main_score"
 	                 android:layout_width="wrap_content"
 	                 android:layout_height="wrap_content"
 	                 android:paddingTop="10dip"
 	                 android:textSize="22sp"
-	                 android:text="124563"/>
+	                 android:text="0"/>
 	         </LinearLayout>
 	         <RelativeLayout 
-	            android:layout_width="fill_parent"
-             	android:layout_height="wrap_content">
+	             	android:id="@+id/main_name_line"
+	            	android:layout_width="fill_parent"
+             		android:layout_height="wrap_content">
 	            <TextView 
 	                 android:layout_width="wrap_content"
 	                 android:layout_height="wrap_content"
@@ -64,20 +66,54 @@
 	     android:layout_width="wrap_content"
 	     android:layout_height="wrap_content"
 	     android:orientation="vertical"
+	     android:paddingRight="20dip"
 	     android:paddingTop="290px"
 	     android:layout_alignParentRight="true" >
 	         <TextView 
 	             android:layout_width="wrap_content"
 	     		 android:layout_height="wrap_content"
-	     		 android:textSize="11.5sp"
-	     		 android:text="Combo Chain:"/>
+	     		 android:textSize="14sp"
+	     		 android:layout_gravity="center_horizontal"
+	     		 android:text="Combo:"/>
 	         <TextView 
+	             android:id="@+id/main_combo"
 	             android:layout_width="wrap_content"
 	     		 android:layout_height="wrap_content"
 	     		 android:textSize="18sp"
 	     		 android:layout_gravity="center_horizontal"
-	     		 android:text="x5"/>
+	     		 android:text="x1"/>
+	 </LinearLayout>
+	 <LinearLayout
+	     android:layout_width="wrap_content"
+	     android:layout_height="wrap_content"
+	     android:orientation="vertical"
+	     android:layout_alignParentBottom="true"
+	     android:layout_alignParentRight="true" >
+	         <TextView 
+	             android:layout_width="wrap_content"
+	     		 android:layout_height="wrap_content"
+	     		 android:textSize="14sp"
+	     		 android:layout_gravity="center_horizontal"
+	     		 android:text="Lines Sent:"/>
+	         <TextView 
+	             android:id="@+id/main_lines_sent"
+	             android:layout_width="wrap_content"
+	     		 android:layout_height="wrap_content"
+	     		 android:textSize="18sp"
+	     		 android:layout_gravity="center_horizontal"
+	     		 android:text="0"/>
 	 </LinearLayout>  
+	 <TextView 
+	             android:id = "@+id/main_lines_to_send"
+	             android:paddingTop="360px"
+	             android:paddingRight="80px"
+	     		 android:layout_alignParentRight="true"
+	             android:layout_width="wrap_content"
+	     		 android:layout_height="wrap_content"
+	     		 android:textSize="18sp"
+	     		 android:textColor="@color/green_ok"
+	     		 android:layout_gravity="center_horizontal"
+	     		 android:text="0"/>
      <com.bgu.android.tetris.MainMap
          android:id="@+id/tetris"
          android:layout_width="match_parent"

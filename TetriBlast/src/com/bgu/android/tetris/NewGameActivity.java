@@ -29,7 +29,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 	private TextView statusTxt;
 	private RelativeLayout multiLayout;
 	private SharedPreferences ref;
-	protected BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);;
+	protected BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);
 	
 	// The Handler that gets information back from the BluetoothConnectivity
     private final Handler mHandler = new Handler() {
