@@ -57,34 +57,6 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
                     break;
                 }
                 break;
-//            case MESSAGE_WRITE:
-//                byte[] writeBuf = (byte[]) msg.obj;
-//                // construct a string from the buffer
-//                String writeMessage = new String(writeBuf);
-//                mConversationArrayAdapter.add("Me:  " + writeMessage);
-//                break;
-//            case BluetoothConnectivity.MESSAGE_READ:
-//                byte[] readBuf = (byte[]) msg.obj;
-//                // construct a string from the valid bytes in the buffer
-//                String readMessage = new String(readBuf, 0, msg.arg1);
-//                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
-//                if (readMessage == "start") {
-//                	me.mProgresDialog.dismiss();
-//                	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
-//                	Intent intt = new Intent(me, NewGameActivity.class);
-//					startActivity(intt);
-//                }
-//                break;
-//            case BluetoothConnectivity.MESSAGE_DEVICE_NAME:
-//                // save the connected device's name
-//                mConnectedDeviceName = msg.getData().getString(BluetoothConnectivity.DEVICE_NAME);
-//                Toast.makeText(getApplicationContext(), "Connected to "
-//                               + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-//                break;
-//            case BluetoothConnectivity.MESSAGE_TOAST:
-//                Toast.makeText(getApplicationContext(), msg.getData().getString(BluetoothConnectivity.TOAST),
-//                               Toast.LENGTH_SHORT).show();
-//                break;
             }
         }
     };
@@ -109,9 +81,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 			@Override
 			public void onClick(View v) {
 				saveActivitySettings();
-				String msgStart = "start";//TODO change to constant
-            	byte[] msgSend = msgStart.getBytes();
-            	mBluetoothCon.write(msgSend);
+				mBluetoothCon.write(BluetoothConnectivity.TYPE_START, null);
 				Intent intt = new Intent(me, TetriBlastActivity.class);
 				startActivity(intt);
 				}    
