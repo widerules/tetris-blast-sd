@@ -19,7 +19,7 @@ public class TetrinoMap {
 	public void resetMap() {
 		for(int x = 0; x < MAP_X_SIZE; x++) {
 			for(int y = 0; y < MAP_Y_SIZE;y++) {
-				map[x][y] = 0;
+				map[x][y] = MapView.BLOCK_EMPTY;
 			}
 		}
 	}
@@ -126,5 +126,10 @@ public class TetrinoMap {
 		}
 		map[emptyCell][row]=TileView.BLOCK_EMPTY;
 		
+	}
+
+	public int[][] getMap() {
+		// TODO Auto-generated method stub
+		return map;
 	}
 }

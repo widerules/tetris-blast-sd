@@ -114,8 +114,18 @@
 	     		 android:textColor="@color/green_ok"
 	     		 android:layout_gravity="center_horizontal"
 	     		 android:text="0"/>
-     <com.bgu.android.tetris.MainMap
+	 <ImageView 
+	     android:id="@+id/next_pic"
+	     android:layout_marginTop="121dip"
+	     android:layout_alignParentRight="true"
+         android:layout_marginRight="19dip"
+         android:layout_width="50dip"
+         android:layout_height="50dip"/>
+	 
+     <com.bgu.android.tetris.MapView
          android:id="@+id/tetris"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent" />
+         android:layout_marginTop="100dip"
+         android:layout_marginLeft="26dip"
+         android:layout_width="200dip"
+         android:layout_height="400dip" />
 </RelativeLayout>

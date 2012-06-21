@@ -4,7 +4,7 @@ import android.graphics.Point;
 
 public abstract class Tetrino {
 	public static final int SIZE = 3;
-	public static boolean ghostEnabled = true;
+	public static boolean ghostEnabled = false; //default value
 	public int[][] sMap;
 	public int[][] gMap;//ghost map of tetrino
 	//public int[][] shadowMap;
