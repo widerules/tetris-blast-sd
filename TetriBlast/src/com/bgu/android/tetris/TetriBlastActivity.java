@@ -3,29 +3,35 @@ package com.bgu.android.tetris;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class TetriBlastActivity extends Activity {
 	private static String ICICLE_KEY = "tetris-blast-view";
 	public TetriBlastActivity me = this;
 	public static final String TAG = "TetrisBlast";
 	
-	private MainMap mMainMapView;
+	private MapView mMapView;
+	private MainMap mMainMap;
 	private TextView mComboView;
 	private TextView mLinesToSendView;
 	private TextView mLineSent;
 	private TextView mScoreView;
 	private RelativeLayout mNameLine;
+	private ImageView mNextPic;
 	
     public static final int MSG_LINES_CLEARED = 1;
     public static final int MSG_END_GAME = 2;
+    public static final int MSG_NEXT_PIC = 3;
         
     public static final int GAME_STATUS_PROGRESS = 0;
     public static final int GAME_STATUS_WIN = 1;
@@ -71,19 +77,17 @@ public class TetriBlastActivity extends Activity {
             case MSG_END_GAME:
             	Log.i(TAG, "GAME OVER!");
             	break;
-           
-
+            case MSG_NEXT_PIC:
+            	setNextPic(msg.arg1);
+            	break;
             }
         }
 
 		private void incraseLineToIncrease() {
 			if (mLinesToIncrease!=0)
-				mMainMapView.increaseLines(mLinesToIncrease);
-			mLinesToIncrease=0;
-			
-		}
-
-		
+				mMainMap.increaseLines(mLinesToIncrease);
+			mLinesToIncrease=0;	
+		}		
     };
     
 	/** Called when the activity is first created. */
@@ -92,17 +96,24 @@ public class TetriBlastActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.d(TAG, "Create main layout");
-        //getWindow().setBackgroundDrawableResource(R.drawable.tetris_bg2);//Draw background
-        mMainMapView = (MainMap) findViewById(R.id.tetris);
-        mMainMapView.initNewGame();
-        mMainMapView.setActivityHandler(mHandler);
+        mMapView = (MapView)findViewById(R.id.tetris);
+        mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
+        mMainMap = new MainMap(this, mMapView);
+        mMainMap.initNewGame();
+        mMainMap.setActivityHandler(mHandler);
         mComboView = (TextView)findViewById(R.id.main_combo);
         mScoreView = (TextView)findViewById(R.id.main_score);
         mLinesToSendView = (TextView)findViewById(R.id.main_lines_to_send);
         mLineSent = (TextView)findViewById(R.id.main_lines_sent);
         mNameLine = (RelativeLayout)findViewById(R.id.main_name_line);
+        mNextPic = (ImageView)findViewById(R.id.next_pic);
         
         ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+        mMainMap.setDifficulty(ref.getInt(NewGameActivity.DIFFICULTY, 0));
+        Tetrino.ghostEnabled = ref.getBoolean(NewGameActivity.SHADOW, false);
+        
+        setNextPic(0);
+        
         mGameMode = ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED);
         if (mGameMode == MainMenu.MODE_SINGLE) {
         	mNameLine.setVisibility(View.GONE);
@@ -120,36 +131,45 @@ public class TetriBlastActivity extends Activity {
         mLinesToIncrease = 2;
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
-        	mMainMapView.setMode(MainMap.READY);
+        	mMainMap.setMode(MainMap.READY);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
             if (map != null) {
-            	mMainMapView.restoreState(map);
+            	mMainMap.restoreState(map);
             } else {
-            	mMainMapView.setMode(MainMap.PAUSE);
+            	mMainMap.setMode(MainMap.PAUSE);
             }
         }
+        
+        mMapView.setOnTouchListener(mMainMap.mTouchListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         // Pause the game along with the activity
-        mMainMapView.setMode(MainMap.PAUSE);
+        mMainMap.setMode(MainMap.PAUSE);
     }
     
     @Override
-    protected void onStop() {
-        super.onPause();
+    protected void onResume() {
+        super.onResume();
         // Pause the game along with the activity
-        mMainMapView.setMode(MainMap.PAUSE);
+        mMapView.resume();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Stop the game along with the activity
+        mMainMap.setMode(MainMap.PAUSE);
+        mMapView.pause();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         //Store the game state
-        outState.putBundle(ICICLE_KEY, mMainMapView.saveState());
+        outState.putBundle(ICICLE_KEY, mMainMap.saveState());
     }
     
     private void increaseScore(int linesCleared) {
@@ -194,4 +214,31 @@ public class TetriBlastActivity extends Activity {
     	
 		
 	}
+    
+    private void setNextPic (int pic) {
+    	switch (pic){
+    	case MainMap.I_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_i)));
+    		break;
+    	case MainMap.J_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_j)));
+    		break;
+    	case MainMap.O_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_o)));
+    		break;
+    	case MainMap.L_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_l)));
+    		break;
+    	case MainMap.S_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_s)));
+    		break;
+    	case MainMap.T_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_t)));
+    		break;
+    	case MainMap.Z_TYPE:
+    		mNextPic.setImageBitmap(Bitmap.createBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.next_z)));
+    		break;
+    	}
+    	
+    }
 }

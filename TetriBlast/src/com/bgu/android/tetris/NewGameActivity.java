@@ -18,7 +18,10 @@ import android.widget.Toast;
 
 public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
 	protected static final String TAG = MainMenu.TAG;
-	final NewGameActivity me = this;
+	public final NewGameActivity me = this;
+	public static final String DIFFICULTY = "difficulty";
+	public static final String SHADOW = "shadow";
+	
 	protected Profile profileDb = Profile.getInstance(this);
 	private TextView profileName;
 	private SeekBar diffLevel;
@@ -170,5 +173,10 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 				|| ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED)==MainMenu.MODE_VS)
 			profileDb.setGameMode(temp);
 		profileDb.saveProfileById(ref.getString(MainMenu.PROFILE_ID, null));
+		
+		SharedPreferences.Editor ed = ref.edit();
+		ed.putInt(DIFFICULTY, diffLevel.getProgress());
+		ed.putBoolean(SHADOW, shadowChk.isChecked());
+		ed.commit();
 	}
 }
