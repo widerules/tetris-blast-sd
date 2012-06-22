@@ -56,7 +56,7 @@ public class TetriBlastActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-            case BluetoothConnectivity.MESSAGE_WRITE:
+            case BluetoothConnectivity.MESSAGE_READ:
             	//TODO update name of opponet here
             	switch (msg.arg2) {
             	case BluetoothConnectivity.TYPE_NAME:
