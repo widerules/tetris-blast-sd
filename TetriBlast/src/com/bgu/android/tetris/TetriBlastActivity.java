@@ -33,6 +33,7 @@ public class TetriBlastActivity extends Activity {
     public static final int MSG_LINES_CLEARED = 1;
     public static final int MSG_END_GAME = 2;
     public static final int MSG_NEXT_PIC = 3;
+    public static final int MSG_UPDATE = 4;
         
     public static final int GAME_STATUS_PROGRESS = 0;
     public static final int GAME_STATUS_WIN = 1;
@@ -86,6 +87,9 @@ public class TetriBlastActivity extends Activity {
             case MSG_NEXT_PIC:
             	setNextPic(msg.arg1);
             	break;
+            case MSG_UPDATE://update name
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, mMyName.getText().toString().getBytes());
+            	break;
             }
         }
 
@@ -133,7 +137,8 @@ public class TetriBlastActivity extends Activity {
     		cursor.moveToFirst();
     		String name = cursor.getString(cursor.getColumnIndex(Profile.NAME));
     		mMyName.setText(name);
-        	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
+    		mHandler.sendEmptyMessageDelayed(MSG_UPDATE, 500);
+        	//mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
         }
         mCurrentScore = 0;
         linesToSend = 0;
