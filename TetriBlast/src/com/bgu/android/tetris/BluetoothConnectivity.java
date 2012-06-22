@@ -56,7 +56,11 @@ public class BluetoothConnectivity {
     private ConnectedThread mConnectedThread;
 	
     private int mState;
-
+    
+    //shared parameters of the multiplay game
+    private int mDifficulty;
+    private boolean mWithShadow;
+    
     //private constructor of singleton class
 	private BluetoothConnectivity(Context context){
 		//TODO initialize local variables
