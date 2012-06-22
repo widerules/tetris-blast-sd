@@ -5,13 +5,31 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
 public class MainMap {
+	
+	/**
+     * Labels for the drawables that will be loaded into the TileView class
+     */
+    public static final int BLOCK_EMPTY = 0;
+    public static final int BLOCK_RED = 1;
+    public static final int BLOCK_BLUE = 2;
+    public static final int BLOCK_GREEN = 3;
+    public static final int BLOCK_YELLOW = 4;
+    public static final int BLOCK_PINK = 5;
+    public static final int BLOCK_LIGHBLUE = 6;
+    public static final int BLOCK_ORANGE = 7;
+    public static final int BLOCK_GREY = 8;
+    public static final int BLOCK_GHOST = 9;
+    public static final int BLOCK_BLOCK = 10;
+    public static final int BLOCK_BG1 = 11;
+    public static final int BLOCK_BG2 = 12;
+    public static final int NUM_OF_TILES = 12;
+    
 	public static final int	L_TYPE = 0;
 	public static final int J_TYPE = 1;
 	public static final int	T_TYPE = 2;
@@ -20,7 +38,7 @@ public class MainMap {
 	public static final int	O_TYPE = 5;
 	public static final int	I_TYPE = 6;
 	
-	public static final int MAX_MOVE_DELAY = 1200;//delay [ms]
+	public static final int MAX_MOVE_DELAY = 1100;//delay [ms]
 	public static final int MAX_DIFFICULTY = 10;
 	public static final int MSG_ROUND_BEGIN = 1;
 	public static final int MSG_TETRINO_MOVE = 0;
@@ -33,7 +51,6 @@ public class MainMap {
 	private long mMoveDelay;
 	
 	private int mGameState = PAUSE;
-	//private boolean noShape = true;
 	private Tetrino curTetrino;
 	
 	/**
@@ -61,7 +78,7 @@ public class MainMap {
 	private int yInitRaw;
 	private int yInitDrop;
 	private long initTime;
-	private static final long deltaTh = 300;//threshold time for drop
+	private static final long deltaTh = 250;//threshold time for drop
 	/**
 	 * X move sensitivity
 	 */
@@ -109,10 +126,7 @@ public class MainMap {
 						Log.d(MainMenu.TAG, "Game Over!");
 						initNewGame();
 						mGameState = PAUSE;
-					}
-					//update();
-					//mRedrawHandler.sleep(mMoveDelay);
-					//break;
+					}//intention no break
 				case MSG_TETRINO_MOVE:
 					update();
 					mapCur.resetMap();
@@ -124,8 +138,8 @@ public class MainMap {
 		}
 		
 		public void sleep(long delayMillis) {
-			this.removeMessages(0);
-			sendEmptyMessageDelayed(0, delayMillis);
+			this.removeMessages(MSG_TETRINO_MOVE);
+			sendEmptyMessageDelayed(MSG_TETRINO_MOVE, delayMillis);
 			//sendMessageDelayed(obtainMessage(0), delayMillis);
 		}
 	
@@ -242,7 +256,6 @@ public class MainMap {
 	}
 	
 	private class TouchListener implements OnTouchListener {
-
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			//This prevents touchscreen events from flooding the main thread
@@ -252,7 +265,6 @@ public class MainMap {
 				{
 					//Waits 16ms.
 					event.wait(16);
-
 					//when user touches the screen
 					if(event.getAction() == MotionEvent.ACTION_DOWN)
 					{
@@ -261,15 +273,8 @@ public class MainMap {
 						yInitRaw = (int) Math.floor(event.getRawY());
 						yInitDrop = yInitRaw;
 						wasMoved = false;
-//						if(xInitRaw > 360 && xInitRaw < 450 && yInitRaw > 560 && yInitRaw < 600) {
-//							pausePressed = true;
-//							if(mGameState == READY)
-//								mGameState = PAUSE;
-//							else
-//								mGameState = READY;
-//						}
 					}
-
+					//when user move the finger on the screen
 					if(event.getAction() == MotionEvent.ACTION_MOVE && mGameState == READY && !pausePressed) {
 						int xCurRaw = (int) Math.floor(event.getRawX());
 						int yCurRaw = (int)Math.floor(event.getRawY());
@@ -284,10 +289,10 @@ public class MainMap {
 							for (int i = 0; i < q; i++) { 
 								if (curTetrino.moveLeft(mapCur) && 
 										!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
-//									if (mRedrawHandler.hasMessages(1) == true) {//TODO change to final Name
-//										mRedrawHandler.removeMessages(1);
-//										mRedrawHandler.sendEmptyMessageDelayed(0, 400);//TODO convert to parameter and change to final Name
-//									}
+									if (mRedrawHandler.hasMessages(MSG_ROUND_BEGIN) == true) {
+										mRedrawHandler.removeMessages(MSG_ROUND_BEGIN);
+										mRedrawHandler.sendEmptyMessageDelayed(MSG_TETRINO_MOVE, 400);//TODO convert to parameter and change to final Name
+									}
 								}
 
 								mapCur.putTetrinoOnMap(curTetrino);
@@ -305,10 +310,10 @@ public class MainMap {
 							for (int i = 0; i < q; i++) {
 								if(curTetrino.moveRight(mapCur) &&
 										!curTetrino.isColusionY(curTetrino.getYPos()+1, curTetrino.getXPos(), curTetrino.sMap, mapCur, false)) {
-//									if (mRedrawHandler.hasMessages(1) == true) {//TODO change to final Name
-//										mRedrawHandler.removeMessages(1);
-//										mRedrawHandler.sendEmptyMessageDelayed(0, 400);//TODO convert to parameter and change to final Name
-//									}
+									if (mRedrawHandler.hasMessages(MSG_ROUND_BEGIN) == true) {
+										mRedrawHandler.removeMessages(MSG_ROUND_BEGIN);
+										mRedrawHandler.sendEmptyMessageDelayed(MSG_TETRINO_MOVE, 400);//TODO convert to parameter and change to final Name
+									}
 								}
 								mapCur.putTetrinoOnMap(curTetrino);
 							}
@@ -321,7 +326,6 @@ public class MainMap {
 								yInitDrop = yCurRaw;
 								initTime = SystemClock.uptimeMillis();
 							}
-							wasMoved = true;
 							yInitRaw = yCurRaw;
 							//yInitDrop = yInitRaw;
 							
@@ -340,14 +344,14 @@ public class MainMap {
 						long timeDelta = Math.abs(initTime - SystemClock.uptimeMillis()); 
 						if(mGameState == READY && !pausePressed){
 							int yCurRaw = (int) Math.floor(event.getRawY());
-							if(yCurRaw - yInitDrop > dropSensativity && timeDelta < deltaTh) {
+							if(yCurRaw - yInitDrop > dropSensativity && timeDelta < deltaTh && !wasMoved) {
 								mapCur.resetMap();
 								mapCur.copyFrom(mapOld);
 								curTetrino.drop(mapCur);
 								mapCur.putTetrinoOnMap(curTetrino);
 								update();
-								mRedrawHandler.removeMessages(0);
-								mRedrawHandler.sendEmptyMessage(1);//TODO change to final name
+								mRedrawHandler.removeMessages(MSG_TETRINO_MOVE);
+								mRedrawHandler.sendEmptyMessage(MSG_ROUND_BEGIN);
 							}
 							//Rotate tetrino (release on same x pos) 
 							else if (!wasMoved && Math.abs(yCurRaw - yInitRaw) < rotateSens ) {

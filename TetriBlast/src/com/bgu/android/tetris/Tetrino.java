@@ -30,8 +30,8 @@ public abstract class Tetrino {
 	private void initTetrino(int tetrinoSize) {
 		for(int col = 0; col < tetrinoSize; col++) {
 			for(int row = 0; row < tetrinoSize; row++) {
-				sMap[col][row] = TileView.BLOCK_EMPTY;
-				gMap[col][row] = TileView.BLOCK_EMPTY;//ghost Map
+				sMap[col][row] = MainMap.BLOCK_EMPTY;
+				gMap[col][row] = MainMap.BLOCK_EMPTY;//ghost Map
 			}
 		}
 		
@@ -46,7 +46,7 @@ public abstract class Tetrino {
 	protected void resetGhost(int size) {
 		for(int col = 0; col < size; col++) {
 			for(int row = 0; row < size; row++)
-				gMap[col][row] = TileView.BLOCK_EMPTY;//ghost Map
+				gMap[col][row] = MainMap.BLOCK_EMPTY;//ghost Map
 		}
 	}
 
@@ -101,10 +101,10 @@ public abstract class Tetrino {
 		if(x >= 0 && x < TetrinoMap.MAP_X_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (sMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (sMap[col][row] != MainMap.BLOCK_EMPTY) {
 						if (x + col >= TetrinoMap.MAP_X_SIZE || x + col < 0 ||
 								y + row >= TetrinoMap.MAP_Y_SIZE ||
-								map.getMapValue(x + col, y + row) != TileView.BLOCK_EMPTY)
+								map.getMapValue(x + col, y + row) != MainMap.BLOCK_EMPTY)
 							return false;
 					}
 				}
@@ -120,18 +120,18 @@ public abstract class Tetrino {
 		if(newY < TetrinoMap.MAP_Y_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (tMap[col][row] != MainMap.BLOCK_EMPTY) {
 						if (isGhost) {//TODO need to think about if condition
 							if ((newX + col) >= 0 && (newX + col) < TetrinoMap.MAP_X_SIZE) {
 								if (newY + row >= TetrinoMap.MAP_Y_SIZE || 
-										map.getMapValue(newX + col, newY + row) != TileView.BLOCK_EMPTY)
+										map.getMapValue(newX + col, newY + row) != MainMap.BLOCK_EMPTY)
 									return true;
 							}
 						}
 						else {
 							if ((newX + col) >= 0 && (newX + col) < TetrinoMap.MAP_X_SIZE) {
 								if (newY + row >= TetrinoMap.MAP_Y_SIZE ||
-										map.getMapValue(newX + col, newY + row) != TileView.BLOCK_EMPTY)
+										map.getMapValue(newX + col, newY + row) != MainMap.BLOCK_EMPTY)
 									return true;
 							}
 						}
@@ -163,9 +163,9 @@ public abstract class Tetrino {
 		if(newX >= -1 && newX < TetrinoMap.MAP_X_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (tMap[col][row] != MainMap.BLOCK_EMPTY) {
 						if (newX + col >= TetrinoMap.MAP_X_SIZE || newX + col < 0 ||
-								map.getMapValue(newX + col, this.pos.y + row) != TileView.BLOCK_EMPTY)
+								map.getMapValue(newX + col, this.pos.y + row) != MainMap.BLOCK_EMPTY)
 							return true;
 					}
 				}
@@ -228,8 +228,8 @@ public abstract class Tetrino {
 	protected void copyTetrinoMap(int [][] srcMap, int[][] destMap, int size) {
 		for(int x = 0; x < size; x++) {
 			for (int y = 0; y < size; y++) {
-				if (srcMap[x][y] != TileView.BLOCK_EMPTY)
-					destMap[x][y] = TileView.BLOCK_GHOST;
+				if (srcMap[x][y] != MainMap.BLOCK_EMPTY)
+					destMap[x][y] = MainMap.BLOCK_GHOST;
 			}
 		}
 	}

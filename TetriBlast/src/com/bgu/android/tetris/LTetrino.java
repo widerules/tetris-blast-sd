@@ -1,7 +1,7 @@
 package com.bgu.android.tetris;
 
 public class LTetrino extends Tetrino {
-	private static final int BLOCK_TYPE = TileView.BLOCK_ORANGE;
+	private static final int BLOCK_TYPE = MainMap.BLOCK_ORANGE;
 	public LTetrino(int x, int y) {
 		super(x, y);
 		initTetrino();
