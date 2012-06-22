@@ -404,16 +404,23 @@ public class BluetoothConnectivity {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
+            byte[] dataBuff;
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
-
-                    // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, bytes, (int)buffer[0], buffer)
-                            .sendToTarget();
+                    if (bytes > 0) {
+                    	dataBuff = new byte[bytes];
+                    	for (int i = 0; i < bytes; i++)
+                    		dataBuff[i] = buffer[i+1];//copy only data without first type byte
+                    
+                    	// Send the obtained bytes to the UI Activity
+                    	// arg1 - data length, arg2 type, msg Object data array
+                    	mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, dataBuff.length, (int)buffer[0], dataBuff)
+                    	.sendToTarget();
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
