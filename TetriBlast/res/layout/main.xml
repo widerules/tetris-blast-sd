@@ -42,24 +42,25 @@
 	            	android:layout_width="fill_parent"
              		android:layout_height="wrap_content">
 	            <TextView 
-	                 android:layout_width="wrap_content"
-	                 android:layout_height="wrap_content"
-	                 android:layout_alignParentLeft="true"
-	                 android:paddingLeft="20dip"
-	                 android:textSize="22sp"
-	                 android:text="Denis"/>
+	                android:id="@+id/main_my_name"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_alignParentLeft="true"
+	                android:paddingLeft="20dip"
+	                android:textSize="22sp"/>
 	            <ImageView
+	                android:id="@+id/main_vs_logo"
 	                android:layout_width="40dp"
 	                android:layout_height="30dp"
 	                android:layout_centerHorizontal="true" 
 	                android:src="@drawable/vs_logo"/>
 	            <TextView 
-	                 android:layout_width="wrap_content"
-	                 android:layout_height="wrap_content"
-	                 android:layout_alignParentRight="true"
-	                 android:textSize="22sp"
-	                 android:paddingRight="20dip"
-	                 android:text="Ran"/> 
+	                android:id="@+id/main_opponent_name"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_alignParentRight="true"
+	                android:textSize="22sp"
+	                android:paddingRight="20dip"/> 
 	         </RelativeLayout>
 	     </LinearLayout>
 	 <LinearLayout

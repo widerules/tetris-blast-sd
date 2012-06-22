@@ -25,6 +25,8 @@ public class TetriBlastActivity extends Activity {
 	private TextView mLinesToSendView;
 	private TextView mLineSent;
 	private TextView mScoreView;
+	private TextView mMyName;
+	private TextView mOpponentName;
 	private RelativeLayout mNameLine;
 	private ImageView mNextPic;
 	
@@ -39,7 +41,7 @@ public class TetriBlastActivity extends Activity {
     public static final int MAX_LINES_TO_SEND = 7;
     
     private SharedPreferences ref;
-    private BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);
+    private BluetoothConnectivity mBluetoothCon;
     private Profile profileDb = Profile.getInstance(this);
     
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
@@ -56,6 +58,11 @@ public class TetriBlastActivity extends Activity {
             switch (msg.what) {
             case BluetoothConnectivity.MESSAGE_WRITE:
             	//TODO update name of opponet here
+            	switch (msg.arg2) {
+            	case BluetoothConnectivity.TYPE_NAME:
+            		String opName = new String((byte[])msg.obj);
+            		mOpponentName.setText(opName);
+            	}
             	break;
             }
         }
@@ -95,6 +102,8 @@ public class TetriBlastActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.d(TAG, "Create main layout");
+        mBluetoothCon = BluetoothConnectivity.getInstance(this);
+        mBluetoothCon.setHandler(mBtHandler);
         mMapView = (MapView)findViewById(R.id.tetris);
         mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
         mMainMap = new MainMap(this, mMapView);
@@ -102,6 +111,8 @@ public class TetriBlastActivity extends Activity {
         mMainMap.setActivityHandler(mHandler);
         mComboView = (TextView)findViewById(R.id.main_combo);
         mScoreView = (TextView)findViewById(R.id.main_score);
+        mMyName = (TextView)findViewById(R.id.main_my_name);
+        mOpponentName = (TextView)findViewById(R.id.main_opponent_name);
         mLinesToSendView = (TextView)findViewById(R.id.main_lines_to_send);
         mLineSent = (TextView)findViewById(R.id.main_lines_sent);
         mNameLine = (RelativeLayout)findViewById(R.id.main_name_line);
@@ -121,6 +132,7 @@ public class TetriBlastActivity extends Activity {
         	Cursor cursor = profileDb.queryById(ref.getString(MainMenu.PROFILE_ID, null));
     		cursor.moveToFirst();
     		String name = cursor.getString(cursor.getColumnIndex(Profile.NAME));
+    		mMyName.setText(name);
         	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
         }
         mCurrentScore = 0;
