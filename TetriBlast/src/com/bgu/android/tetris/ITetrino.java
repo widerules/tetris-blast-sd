@@ -1,7 +1,7 @@
 package com.bgu.android.tetris;
 
 public class ITetrino extends Tetrino {
-	private static final int BLOCK_TYPE = TileView.BLOCK_BLUE;
+	private static final int BLOCK_TYPE = MainMap.BLOCK_BLUE;
 	public static final int I_SIZE = 4;	
 	public ITetrino(int x, int y) {
 		super(x, y);
@@ -43,9 +43,9 @@ public class ITetrino extends Tetrino {
 		if(newX >= -2 && newX < TetrinoMap.MAP_X_SIZE) {
 			for(int col = 0; col < this.getSize(); col++){
 				for(int row = 0; row < this.getSize(); row++) {
-					if (tMap[col][row] != TileView.BLOCK_EMPTY) {
+					if (tMap[col][row] != MainMap.BLOCK_EMPTY) {
 						if (newX + col >= TetrinoMap.MAP_X_SIZE || newX + col < 0 ||
-								map.getMapValue(newX + col, getYPos() + row) != TileView.BLOCK_EMPTY)
+								map.getMapValue(newX + col, getYPos() + row) != MainMap.BLOCK_EMPTY)
 							return true;
 					}
 				}

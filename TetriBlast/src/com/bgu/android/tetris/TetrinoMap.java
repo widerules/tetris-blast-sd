@@ -1,7 +1,5 @@
 package com.bgu.android.tetris;
 
-import java.util.Random;
-
 public class TetrinoMap {
 	public static final int MAP_X_SIZE = 10;
 	public static final int MAP_Y_SIZE = 20;
@@ -10,10 +8,6 @@ public class TetrinoMap {
 	public TetrinoMap() {
 		map = new int[MAP_X_SIZE][MAP_Y_SIZE];
 		this.resetMap();	
-	}
-	
-	public TetrinoMap(int x, int y) {
-		//TODO implement this for any map size
 	}
 	
 	public void resetMap() {
@@ -33,17 +27,17 @@ public class TetrinoMap {
 	public boolean putTetrinoOnMap(Tetrino shape) {
 		for(int col = 0; col < shape.getSize(); col++){
 			for(int row = 0; row < shape.getSize(); row++) {
-				if (shape.sMap[col][row] != TileView.BLOCK_EMPTY) {
+				if (shape.sMap[col][row] != MainMap.BLOCK_EMPTY) {
 					if(shape.getXPos() + col >= 0 && shape.getXPos() + col < TetrinoMap.MAP_X_SIZE &&
 							shape.getYPos() + row >= 0 && shape.getYPos() + row < TetrinoMap.MAP_Y_SIZE &&
-							(map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_EMPTY ||
-									map[shape.getXPos() + col][shape.getYPos() + row] == TileView.BLOCK_GHOST)) 
+							(map[shape.getXPos() + col][shape.getYPos() + row] == MainMap.BLOCK_EMPTY ||
+									map[shape.getXPos() + col][shape.getYPos() + row] == MainMap.BLOCK_GHOST)) 
 						map[shape.getXPos()+col][shape.getYPos()+row] = shape.sMap[col][row];
 					else
 						return false;
 				}
 				if(Tetrino.ghostEnabled && !shape.onGhost()) {
-					if(shape.gMap[col][row] != TileView.BLOCK_EMPTY)
+					if(shape.gMap[col][row] != MainMap.BLOCK_EMPTY)
 						map[shape.getGhostXPos()+col][shape.getGhostYPos()+row] = shape.gMap[col][row];
 				}
 
@@ -74,7 +68,7 @@ public class TetrinoMap {
 		int lineCounter = 0;
 		for(int y = 0; y < MAP_Y_SIZE; y++) {
 			for(int x = 0; x < MAP_X_SIZE; x++){
-				if(map[x][y] == TileView.BLOCK_EMPTY)
+				if(map[x][y] == MainMap.BLOCK_EMPTY)
 					isLine = false;
 			}
 			if(isLine) {
@@ -109,12 +103,11 @@ public class TetrinoMap {
 			}
 		}
 		for (int x = 0; x < MAP_X_SIZE; x++) {
-			map[x][0] = TileView.BLOCK_EMPTY;
+			map[x][0] = MainMap.BLOCK_EMPTY;
 		}
 	}
 
 	public void setMapValue(int i, int j, int value) {
-		// TODO Auto-generated method stub
 		map[i][j] = value;
 	}
 	private void createRandomLine(int row)
@@ -124,12 +117,11 @@ public class TetrinoMap {
 		for(int x = 0; x < MAP_X_SIZE; x++){
 			map[x][row] = randColor;
 		}
-		map[emptyCell][row]=TileView.BLOCK_EMPTY;
+		map[emptyCell][row]=MainMap.BLOCK_EMPTY;
 		
 	}
 
 	public int[][] getMap() {
-		// TODO Auto-generated method stub
 		return map;
 	}
 }

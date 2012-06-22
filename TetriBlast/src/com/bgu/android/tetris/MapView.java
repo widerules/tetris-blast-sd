@@ -8,8 +8,6 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.LinearLayout;
-
 public class MapView extends SurfaceView implements Runnable {
 
 	/**
