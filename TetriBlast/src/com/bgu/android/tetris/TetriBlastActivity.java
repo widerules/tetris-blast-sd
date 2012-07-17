@@ -52,6 +52,9 @@ public class TetriBlastActivity extends Activity {
     private int mCombo;			//Combo score multiplier
     private int mLinesToIncrease;//Num of score to increase
     
+    private int mDifficulty = 0;
+    private boolean mGhostEn = false;
+    
     // The Handler that gets information back from the BluetoothConnectivity
     private final Handler mBtHandler = new Handler() {
         @Override
@@ -63,8 +66,17 @@ public class TetriBlastActivity extends Activity {
             	case BluetoothConnectivity.TYPE_NAME:
             		String opName = new String((byte[])msg.obj);
             		mOpponentName.setText(opName);
+            		break;
+            	case BluetoothConnectivity.TYPE_DIFFICULTY:
+            		mDifficulty = Integer.getInteger(new String((byte[])msg.obj), 0);
+            		mMainMap.setDifficulty(mDifficulty);
+            		break;
+            	case BluetoothConnectivity.TYPE_SHADOW:
+            		mGhostEn = Boolean.getBoolean(new String((byte[])msg.obj));
+            		Tetrino.ghostEnabled = mGhostEn;
             	}
             	break;
+            	
             }
         }
     };
@@ -89,6 +101,8 @@ public class TetriBlastActivity extends Activity {
             	break;
             case MSG_UPDATE://update name
             	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, mMyName.getText().toString().getBytes());
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, Integer.toString(mDifficulty).getBytes());
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, Boolean.toString(mGhostEn).getBytes());
             	break;
             }
         }
@@ -123,8 +137,10 @@ public class TetriBlastActivity extends Activity {
         mNextPic = (ImageView)findViewById(R.id.next_pic);
         
         ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
-        mMainMap.setDifficulty(ref.getInt(NewGameActivity.DIFFICULTY, 0));
-        Tetrino.ghostEnabled = ref.getBoolean(NewGameActivity.SHADOW, false);
+        mDifficulty = ref.getInt(NewGameActivity.DIFFICULTY, 0);
+        mMainMap.setDifficulty(mDifficulty);
+        mGhostEn = ref.getBoolean(NewGameActivity.SHADOW, false);
+        Tetrino.ghostEnabled = mGhostEn;
         
         setNextPic(0);
         
