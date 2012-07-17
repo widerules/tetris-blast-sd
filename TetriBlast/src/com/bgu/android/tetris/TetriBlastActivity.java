@@ -65,15 +65,21 @@ public class TetriBlastActivity extends Activity {
             	switch (msg.arg2) {
             	case BluetoothConnectivity.TYPE_NAME:
             		String opName = new String((byte[])msg.obj);
+            		Log.i(MainMenu.TAG, "BT Received name: " + opName);
             		mOpponentName.setText(opName);
             		break;
             	case BluetoothConnectivity.TYPE_DIFFICULTY:
-            		mDifficulty = Integer.getInteger(new String((byte[])msg.obj), 0);
+            		int tempDiff = Integer.getInteger(new String((byte[])msg.obj), 0);
+            		Log.i(MainMenu.TAG, "BT Received diff: " + tempDiff);
+            		mDifficulty = tempDiff;
             		mMainMap.setDifficulty(mDifficulty);
             		break;
             	case BluetoothConnectivity.TYPE_SHADOW:
-            		mGhostEn = Boolean.getBoolean(new String((byte[])msg.obj));
+            		boolean tempGh = Boolean.getBoolean(new String((byte[])msg.obj));
+            		Log.i(MainMenu.TAG, "BT Received ghost: " + Boolean.toString(tempGh));
+            		mGhostEn = tempGh;
             		Tetrino.ghostEnabled = mGhostEn;
+            		
             	}
             	break;
             	
@@ -100,9 +106,15 @@ public class TetriBlastActivity extends Activity {
             	setNextPic(msg.arg1);
             	break;
             case MSG_UPDATE://update name
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, mMyName.getText().toString().getBytes());
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, Integer.toString(mDifficulty).getBytes());
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, Boolean.toString(mGhostEn).getBytes());
+            	String myName = mMyName.getText().toString();
+            	String myDiff = Integer.toString(mDifficulty);
+            	String myShadow = Boolean.toString(mGhostEn);
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, myName.getBytes());
+            	Log.i(MainMenu.TAG, "Sent via BT name: " + myName);
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, myDiff.getBytes());
+            	Log.i(MainMenu.TAG, "Sent via BT difficult: " + myDiff);
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
+            	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
             	break;
             }
         }
