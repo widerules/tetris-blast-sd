@@ -169,7 +169,7 @@ public class TetriBlastActivity extends Activity {
         mMapView = (MapView)findViewById(R.id.tetris);
         mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
         mMainMap = new MainMap(this, mMapView);
-        //mMainMap.initNewGame();
+        mMainMap.initNewGame();
         mMainMap.setActivityHandler(mHandler);
         mComboView = (TextView)findViewById(R.id.main_combo);
         mScoreView = (TextView)findViewById(R.id.main_score);
@@ -213,8 +213,7 @@ public class TetriBlastActivity extends Activity {
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	//mMainMap.setMode(MainMap.READY);
-        	mMainMap.initNewGame();
-        	mHandler.sendEmptyMessage(MSG_PAUSE);
+        	mHandler.sendEmptyMessage(mGameState);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
