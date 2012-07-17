@@ -54,6 +54,7 @@ public class TetriBlastActivity extends Activity {
     
     private int mDifficulty = 0;
     private boolean mGhostEn = false;
+    private boolean mIamHost = false;
     
     // The Handler that gets information back from the BluetoothConnectivity
     private final Handler mBtHandler = new Handler() {
@@ -111,10 +112,12 @@ public class TetriBlastActivity extends Activity {
             	String myShadow = Boolean.toString(mGhostEn);
             	mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, myName.getBytes());
             	Log.i(MainMenu.TAG, "Sent via BT name: " + myName);
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, myDiff.getBytes());
-            	Log.i(MainMenu.TAG, "Sent via BT difficult: " + myDiff);
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
-            	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
+            	if(mIamHost) {
+            		mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, myDiff.getBytes());
+                	Log.i(MainMenu.TAG, "Sent via BT difficult: " + myDiff);
+                	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
+                	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
+            	}
             	break;
             }
         }
@@ -154,7 +157,12 @@ public class TetriBlastActivity extends Activity {
         mGhostEn = ref.getBoolean(NewGameActivity.SHADOW, false);
         Tetrino.ghostEnabled = mGhostEn;
         
-        setNextPic(0);
+        mIamHost = ref.getBoolean(NewGameActivity.HOST, false);
+        SharedPreferences.Editor ed = ref.edit();
+		ed.putBoolean(NewGameActivity.HOST, false);
+		ed.commit();
+        
+		setNextPic(0);
         
         mGameMode = ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED);
         if (mGameMode == MainMenu.MODE_SINGLE) {
