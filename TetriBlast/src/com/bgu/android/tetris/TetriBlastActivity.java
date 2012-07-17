@@ -90,6 +90,7 @@ public class TetriBlastActivity extends Activity {
             	case BluetoothConnectivity.TYPE_UNPAUSE:
             		me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
             		Log.i(MainMenu.TAG, "Sent unpause hendler message");
+            		break;
             	case BluetoothConnectivity.TYPE_PAUSE:
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
             		Log.i(MainMenu.TAG, "Sent pause hendler message");
