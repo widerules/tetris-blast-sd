@@ -21,6 +21,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 	public final NewGameActivity me = this;
 	public static final String DIFFICULTY = "difficulty";
 	public static final String SHADOW = "shadow";
+	public static final String HOST = "host";
 	
 	protected Profile profileDb = Profile.getInstance(this);
 	private TextView profileName;
@@ -177,6 +178,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 		SharedPreferences.Editor ed = ref.edit();
 		ed.putInt(DIFFICULTY, diffLevel.getProgress());
 		ed.putBoolean(SHADOW, shadowChk.isChecked());
+		ed.putBoolean(HOST, true);
 		ed.commit();
 	}
 }
