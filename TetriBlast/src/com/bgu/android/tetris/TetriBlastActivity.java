@@ -54,6 +54,7 @@ public class TetriBlastActivity extends Activity {
     private int mTotalLinesSent;//Total lines sent
     private int mCombo;			//Combo score multiplier
     private int mLinesToIncrease;//Num of score to increase
+    private int mGameState = MainMap.PAUSE;//State of the game (PAUSE or READY final on MainMap)
     
     private int mDifficulty = 0;
     private boolean mGhostEn = false;
@@ -130,13 +131,18 @@ public class TetriBlastActivity extends Activity {
                 	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
                 	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
             	}
-            	mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, null);
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, null);//unpause and start the game
             	break;
             case MSG_PAUSE:
-            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pouse");
-            	//TODO pause message
+            	mGameState = MainMap.PAUSE;
+            	mMainMap.setMode(mGameState);
+            	mMapView.pause();
+            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
             	break;
             case MSG_UNPAUSE:
+            	mGameState = MainMap.READY;
+            	mMainMap.setMode(mGameState);
+            	mMapView.resume();
             	me.progressDialog.dismiss();
             }
         }
@@ -228,7 +234,7 @@ public class TetriBlastActivity extends Activity {
     protected void onResume() {
         super.onResume();
         // Pause the game along with the activity
-        mMainMap.setMode(MainMap.READY);
+        mMainMap.setMode(mGameState);
         mMapView.resume();
     }
     @Override
