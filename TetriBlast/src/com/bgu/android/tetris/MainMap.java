@@ -134,6 +134,8 @@ public class MainMap {
 					gameMove();
 					break;
 				}
+			}else {//If not ready (on Pause)
+				this.sendEmptyMessageDelayed(msg.what, 500);
 			}
 		}
 		

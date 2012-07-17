@@ -133,18 +133,21 @@ public class TetriBlastActivity extends Activity {
                 	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
             	}
             	mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, null);//unpause and start the game
+            	Log.i(MainMenu.TAG, "Sent TYPE_UNPAUSE via BT name: ");
             	break;
             case MSG_PAUSE:
             	mGameState = MainMap.PAUSE;
             	mMainMap.setMode(mGameState);
             	mMapView.pause();
             	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
+            	Log.i(MainMenu.TAG,"MSG_PAUSE");
             	break;
             case MSG_UNPAUSE:
             	mGameState = MainMap.READY;
             	mMainMap.setMode(mGameState);
             	mMapView.resume();
             	me.progressDialog.dismiss();
+            	Log.i(MainMenu.TAG,"MSG_UNPAUSE");
             }
         }
 
@@ -166,7 +169,7 @@ public class TetriBlastActivity extends Activity {
         mMapView = (MapView)findViewById(R.id.tetris);
         mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
         mMainMap = new MainMap(this, mMapView);
-        mMainMap.initNewGame();
+        //mMainMap.initNewGame();
         mMainMap.setActivityHandler(mHandler);
         mComboView = (TextView)findViewById(R.id.main_combo);
         mScoreView = (TextView)findViewById(R.id.main_score);
@@ -210,6 +213,7 @@ public class TetriBlastActivity extends Activity {
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	//mMainMap.setMode(MainMap.READY);
+        	mMainMap.initNewGame();
         	mHandler.sendEmptyMessage(MSG_PAUSE);
         } else {
             // We are being restored
@@ -228,15 +232,15 @@ public class TetriBlastActivity extends Activity {
     protected void onPause() {
         super.onPause();
         // Pause the game along with the activity
-        mMainMap.setMode(MainMap.PAUSE);
+        //mMainMap.setMode(MainMap.PAUSE);
     }
     
     @Override
     protected void onResume() {
         super.onResume();
         // Pause the game along with the activity
-        mMainMap.setMode(mGameState);
-        mMapView.resume();
+        //mMainMap.setMode(mGameState);
+        //mMapView.resume();
     }
     @Override
     protected void onStop() {
