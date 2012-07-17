@@ -136,18 +136,22 @@ public class TetriBlastActivity extends Activity {
             	Log.i(MainMenu.TAG, "Sent TYPE_UNPAUSE via BT name: ");
             	break;
             case MSG_PAUSE:
-            	mGameState = MainMap.PAUSE;
-            	mMainMap.setMode(mGameState);
-            	mMapView.pause();
-            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
-            	Log.i(MainMenu.TAG,"MSG_PAUSE");
+            	if(mGameState == MainMap.READY){
+            		mGameState = MainMap.PAUSE;
+            		mMainMap.setMode(mGameState);
+            		mMapView.pause();
+            		me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
+            		Log.i(MainMenu.TAG,"MSG_PAUSE");
+            	}
             	break;
             case MSG_UNPAUSE:
-            	mGameState = MainMap.READY;
-            	mMainMap.setMode(mGameState);
-            	mMapView.resume();
-            	me.progressDialog.dismiss();
-            	Log.i(MainMenu.TAG,"MSG_UNPAUSE");
+            	if(mGameState == MainMap.PAUSE){
+            		mGameState = MainMap.READY;
+            		mMainMap.setMode(mGameState);
+            		mMapView.resume();
+            		me.progressDialog.dismiss();
+            		Log.i(MainMenu.TAG,"MSG_UNPAUSE");
+            	}
             }
         }
 
