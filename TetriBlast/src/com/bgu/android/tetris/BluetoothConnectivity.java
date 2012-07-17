@@ -48,6 +48,8 @@ public class BluetoothConnectivity {
     public static final int TYPE_NAME = 6;
     public static final int TYPE_DIFFICULTY = 7;//BT message type that set the difficulty of the game
     public static final int TYPE_SHADOW = 8;//BT message type that set shadow on/off
+    public static final int TYPE_UNPAUSE = 9;
+    public static final int TYPE_PAUSE = 10;
     
 	private static BluetoothConnectivity instance = null;
 	private final BluetoothAdapter mAdapter;
@@ -417,7 +419,9 @@ public class BluetoothConnectivity {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
+                    
                     if (bytes > 0) {
+                    	//Log.i(MainMenu.TAG, "Bytes received: " + bytes);
                     	dataBuff = new byte[bytes-1];
                     	for (int i = 0; i < dataBuff.length; i++)
                     		dataBuff[i] = buffer[i+1];//copy only data without first type byte

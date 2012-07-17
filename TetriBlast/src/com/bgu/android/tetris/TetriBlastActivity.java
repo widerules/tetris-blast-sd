@@ -1,6 +1,7 @@
 package com.bgu.android.tetris;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -34,6 +35,8 @@ public class TetriBlastActivity extends Activity {
     public static final int MSG_END_GAME = 2;
     public static final int MSG_NEXT_PIC = 3;
     public static final int MSG_UPDATE = 4;
+    public static final int MSG_PAUSE = 5;
+    public static final int MSG_UNPAUSE = 6;
         
     public static final int GAME_STATUS_PROGRESS = 0;
     public static final int GAME_STATUS_WIN = 1;
@@ -44,7 +47,7 @@ public class TetriBlastActivity extends Activity {
     private SharedPreferences ref;
     private BluetoothConnectivity mBluetoothCon;
     private Profile profileDb = Profile.getInstance(this);
-    
+    private ProgressDialog progressDialog;
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
     private long mCurrentScore;	//Curent score of the player
     private int linesToSend;	//Num of lines to send via bluetooth
@@ -66,25 +69,32 @@ public class TetriBlastActivity extends Activity {
             	switch (msg.arg2) {
             	case BluetoothConnectivity.TYPE_NAME:
             		String opName = new String((byte[])msg.obj);
-            		Log.i(MainMenu.TAG, "BT Received name: " + opName + " lenght: " + msg.arg2);
+            		//Log.i(MainMenu.TAG, "BT Received name: " + opName + " lenght: " + msg.arg1);
             		mOpponentName.setText(opName);
             		break;
             	case BluetoothConnectivity.TYPE_DIFFICULTY:
             		String diffSt = new String((byte[])msg.obj);
-            		int tempDiff = Integer.getInteger(diffSt, 0);
-            		Log.i(MainMenu.TAG, "BT Received diff: " + diffSt + " lenght: " + msg.arg2);
+            		int tempDiff = Integer.parseInt(diffSt);
+            		//Log.i(MainMenu.TAG, "BT Received diff: " + tempDiff + " lenght: " + msg.arg1);
             		mDifficulty = tempDiff;
             		mMainMap.setDifficulty(mDifficulty);
             		break;
             	case BluetoothConnectivity.TYPE_SHADOW:
             		String shadowSt = new String((byte[])msg.obj);
-            		boolean tempGh = Boolean.getBoolean(shadowSt);
-            		Log.i(MainMenu.TAG, "BT Received ghost: " + shadowSt + " lenght: " + msg.arg2);
+            		boolean tempGh = Boolean.parseBoolean(shadowSt);
+            		//Log.i(MainMenu.TAG, "BT Received ghost: " + tempGh + " lenght: " + msg.arg1);
             		mGhostEn = tempGh;
             		Tetrino.ghostEnabled = mGhostEn;
-            		
+            		break;
+            	case BluetoothConnectivity.TYPE_UNPAUSE:
+            		me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
+            		Log.i(MainMenu.TAG, "Sent unpause hendler message");
+            	case BluetoothConnectivity.TYPE_PAUSE:
+            		me.mHandler.sendEmptyMessage(MSG_PAUSE);
+            		Log.i(MainMenu.TAG, "Sent pause hendler message");
             	}
             	break;
+            	
             	
             }
         }
@@ -108,7 +118,7 @@ public class TetriBlastActivity extends Activity {
             case MSG_NEXT_PIC:
             	setNextPic(msg.arg1);
             	break;
-            case MSG_UPDATE://update name
+            case MSG_UPDATE://update name, difficult and shadow
             	String myName = mMyName.getText().toString();
             	String myDiff = Integer.toString(mDifficulty);
             	String myShadow = Boolean.toString(mGhostEn);
@@ -120,7 +130,14 @@ public class TetriBlastActivity extends Activity {
                 	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
                 	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
             	}
+            	mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, null);
             	break;
+            case MSG_PAUSE:
+            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pouse");
+            	//TODO pause message
+            	break;
+            case MSG_UNPAUSE:
+            	me.progressDialog.dismiss();
             }
         }
 
@@ -182,10 +199,11 @@ public class TetriBlastActivity extends Activity {
         linesToSend = 0;
         mCombo = 1;
         mTotalLinesSent = 0;
-        mLinesToIncrease = 2;
+        mLinesToIncrease = 2;//TODO remove this
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
-        	mMainMap.setMode(MainMap.READY);
+        	//mMainMap.setMode(MainMap.READY);
+        	mHandler.sendEmptyMessage(MSG_PAUSE);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
@@ -210,6 +228,7 @@ public class TetriBlastActivity extends Activity {
     protected void onResume() {
         super.onResume();
         // Pause the game along with the activity
+        mMainMap.setMode(MainMap.READY);
         mMapView.resume();
     }
     @Override
