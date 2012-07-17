@@ -136,13 +136,11 @@ public class TetriBlastActivity extends Activity {
             	Log.i(MainMenu.TAG, "Sent TYPE_UNPAUSE via BT name: ");
             	break;
             case MSG_PAUSE:
-            	if(mGameState == MainMap.READY){
-            		mGameState = MainMap.PAUSE;
-            		mMainMap.setMode(mGameState);
-            		mMapView.pause();
-            		me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
-            		Log.i(MainMenu.TAG,"MSG_PAUSE");
-            	}
+            	mGameState = MainMap.PAUSE;
+            	mMainMap.setMode(mGameState);
+            	mMapView.pause();
+            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
+            	Log.i(MainMenu.TAG,"MSG_PAUSE");
             	break;
             case MSG_UNPAUSE:
             	if(mGameState == MainMap.PAUSE){
@@ -217,7 +215,7 @@ public class TetriBlastActivity extends Activity {
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	//mMainMap.setMode(MainMap.READY);
-        	mHandler.sendEmptyMessage(mGameState);
+        	mHandler.sendEmptyMessage(MSG_PAUSE);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
