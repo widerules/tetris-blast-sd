@@ -66,18 +66,20 @@ public class TetriBlastActivity extends Activity {
             	switch (msg.arg2) {
             	case BluetoothConnectivity.TYPE_NAME:
             		String opName = new String((byte[])msg.obj);
-            		Log.i(MainMenu.TAG, "BT Received name: " + opName);
+            		Log.i(MainMenu.TAG, "BT Received name: " + opName + " lenght: " + msg.arg2);
             		mOpponentName.setText(opName);
             		break;
             	case BluetoothConnectivity.TYPE_DIFFICULTY:
-            		int tempDiff = Integer.getInteger(new String((byte[])msg.obj), 0);
-            		Log.i(MainMenu.TAG, "BT Received diff: " + tempDiff);
+            		String diffSt = new String((byte[])msg.obj);
+            		int tempDiff = Integer.getInteger(diffSt, 0);
+            		Log.i(MainMenu.TAG, "BT Received diff: " + diffSt + " lenght: " + msg.arg2);
             		mDifficulty = tempDiff;
             		mMainMap.setDifficulty(mDifficulty);
             		break;
             	case BluetoothConnectivity.TYPE_SHADOW:
-            		boolean tempGh = Boolean.getBoolean(new String((byte[])msg.obj));
-            		Log.i(MainMenu.TAG, "BT Received ghost: " + Boolean.toString(tempGh));
+            		String shadowSt = new String((byte[])msg.obj);
+            		boolean tempGh = Boolean.getBoolean(shadowSt);
+            		Log.i(MainMenu.TAG, "BT Received ghost: " + shadowSt + " lenght: " + msg.arg2);
             		mGhostEn = tempGh;
             		Tetrino.ghostEnabled = mGhostEn;
             		
