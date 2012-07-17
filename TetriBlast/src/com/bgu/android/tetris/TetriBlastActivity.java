@@ -241,7 +241,7 @@ public class TetriBlastActivity extends Activity {
         super.onResume();
         // Pause the game along with the activity
         //mMainMap.setMode(mGameState);
-        //mMapView.resume();
+        mMapView.resume();
     }
     @Override
     protected void onStop() {
