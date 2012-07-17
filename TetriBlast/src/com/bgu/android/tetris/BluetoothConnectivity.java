@@ -418,8 +418,8 @@ public class BluetoothConnectivity {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     if (bytes > 0) {
-                    	dataBuff = new byte[bytes];
-                    	for (int i = 0; i < bytes; i++)
+                    	dataBuff = new byte[bytes-1];
+                    	for (int i = 0; i < dataBuff.length; i++)
                     		dataBuff[i] = buffer[i+1];//copy only data without first type byte
                     
                     	// Send the obtained bytes to the UI Activity
