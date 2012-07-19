@@ -33,15 +33,15 @@ public class MapView extends SurfaceView implements Runnable {
 	
 	public Thread mViewThread = null;
 	public SurfaceHolder mHolder;
-	boolean isOk = false;
-	boolean needToUpdate = true;
+	//boolean isOk = false;
+	//boolean needToUpdate = true;
 	
 	Bitmap[] tiles;
 	int[][] tileMap;
 	int paternHeight;
 	int paternWidth;
 	
-	int curTile = 0;
+	//int curTile = 0;
 	
 	
 	public MapView(Context context, AttributeSet attrs) {
@@ -62,18 +62,15 @@ public class MapView extends SurfaceView implements Runnable {
 		}
 	}
 	
-	
 	@Override
 	public void run() {
-		while (isOk) {
-			if(!mHolder.getSurface().isValid()) {
-				continue;//go back to while and check again
-			}
-			if (needToUpdate) {
+		boolean updated = false;
+		while(!updated){
+			if(mHolder.getSurface().isValid()) {
 				Canvas c = mHolder.lockCanvas();
 				drawOnCanvas(c);
 				mHolder.unlockCanvasAndPost(c);
-				needToUpdate = false;
+				updated = true;
 			}
 		}
 	}
@@ -100,27 +97,43 @@ public class MapView extends SurfaceView implements Runnable {
 				tileMap[col][row] = map[col][row];
 			}
 		}
-		needToUpdate = true;
-	}
-	
-	public void pause() {
-		isOk = false;
-		while(mViewThread.isAlive() == true) {
-			try {
-				mViewThread.join();
-			}catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			break;
-		}
-		mViewThread = null;
-	}
-	
-	public void resume() {
-		isOk = true;
-		needToUpdate = true;
+		cleanStop();
 		mViewThread = new Thread(this);
 		mViewThread.start();
 	}
+	
+	public void cleanStop() {
+		if(mViewThread != null){
+			while(mViewThread.isAlive() == true) {
+				try {
+					mViewThread.join();
+				}catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				break;
+			}
+			mViewThread = null;
+		}
+	}
+	
+//	public void pause() {
+//		isOk = false;
+//		while(mViewThread.isAlive() == true) {
+//			try {
+//				mViewThread.join();
+//			}catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			break;
+//		}
+//		mViewThread = null;
+//	}
+	
+//	public void resume() {
+//		isOk = true;
+//		needToUpdate = true;
+//		mViewThread = new Thread(this);
+//		mViewThread.start();
+//	}
 	
 }
