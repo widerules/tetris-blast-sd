@@ -105,6 +105,7 @@ public class TetriBlastActivity extends Activity {
             	case BluetoothConnectivity.TYPE_LINES://received lines to increase
             		String stLines = new String((byte[])msg.obj);
             		int lines = Integer.parseInt(stLines);
+            		Log.i(MainMenu.TAG, "Received lines to increase: " + lines);
             		mLinesToIncrease = lines;
             		break;
             	}
@@ -364,7 +365,7 @@ public class TetriBlastActivity extends Activity {
     private void increaseLinesToSend(int linesCleared) {
     	if (linesCleared == 0) {
     		String stLines = Integer.toString(linesToSend);
-    		mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, stLines.getBytes());//send(linesToSend)//send via Bluetooth
+    		mBluetoothCon.write(BluetoothConnectivity.TYPE_LINES, stLines.getBytes());//send(linesToSend)//send via Bluetooth
     		mTotalLinesSent += linesToSend;
     		linesToSend = 0;
     		
@@ -373,7 +374,7 @@ public class TetriBlastActivity extends Activity {
     		int temp = (linesCleared-1) + linesToSend;
     		if (temp > MAX_LINES_TO_SEND) {
     			String stLines = Integer.toString(MAX_LINES_TO_SEND);
-        		mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, stLines.getBytes());//send(MAX_LINES)//send via Bluetooth
+        		mBluetoothCon.write(BluetoothConnectivity.TYPE_LINES, stLines.getBytes());//send(MAX_LINES)//send via Bluetooth
     			linesToSend = temp - MAX_LINES_TO_SEND;
     			mTotalLinesSent += MAX_LINES_TO_SEND;
     		}
