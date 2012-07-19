@@ -52,7 +52,7 @@ public class TetriBlastActivity extends Activity {
     private SharedPreferences ref;
     private BluetoothConnectivity mBluetoothCon;
     private Profile profileDb = Profile.getInstance(this);
-    //private ProgressDialog progressDialog;
+    private Dialog mDialog;
    
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
     private long mCurrentScore;	//Curent score of the player
@@ -94,6 +94,8 @@ public class TetriBlastActivity extends Activity {
             		Tetrino.ghostEnabled = mGhostEn;
             		break;
             	case BluetoothConnectivity.TYPE_UNPAUSE:
+            		if(mDialog != null && mDialog.isShowing())
+            			mDialog.cancel();
             		me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
             		Log.i(MainMenu.TAG, "Sent unpause hendler message");
             		break;
@@ -270,18 +272,18 @@ public class TetriBlastActivity extends Activity {
     
     @Override
     protected Dialog onCreateDialog(int id) {
-    	Dialog dialog = null;
+    	mDialog = null;
     	switch(id) {
     	case DIALOG_PAUSE:
-    		dialog = createPauseDialog();
+    		mDialog = createPauseDialog();
     		break;
     	case DIALOG_EXIT:
-    		dialog = createExitDialog();
+    		mDialog = createExitDialog();
     		break;
     	default:
-    		dialog = null;
+    		mDialog = null;
     	}
-    	return dialog;
+    	return mDialog;
     }
     
     private Dialog createPauseDialog() {
