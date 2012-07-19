@@ -1,7 +1,10 @@
 package com.bgu.android.tetris;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -19,6 +22,8 @@ public class TetriBlastActivity extends Activity {
 	private static String ICICLE_KEY = "tetris-blast-view";
 	public TetriBlastActivity me = this;
 	public static final String TAG = "TetrisBlast";
+	public static final int DIALOG_PAUSE = 0;
+	public static final int DIALOG_EXIT = 1;
 	
 	private MapView mMapView;
 	private MainMap mMainMap;
@@ -47,7 +52,8 @@ public class TetriBlastActivity extends Activity {
     private SharedPreferences ref;
     private BluetoothConnectivity mBluetoothCon;
     private Profile profileDb = Profile.getInstance(this);
-    private ProgressDialog progressDialog;
+    //private ProgressDialog progressDialog;
+   
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
     private long mCurrentScore;	//Curent score of the player
     private int linesToSend;	//Num of lines to send via bluetooth
@@ -138,16 +144,12 @@ public class TetriBlastActivity extends Activity {
             case MSG_PAUSE:
             	mGameState = MainMap.PAUSE;
             	mMainMap.setMode(mGameState);
-            	mMapView.pause();
-            	me.progressDialog = ProgressDialog.show(me, "Pause", "Game on Pause");
             	Log.i(MainMenu.TAG,"MSG_PAUSE");
             	break;
             case MSG_UNPAUSE:
             	if(mGameState == MainMap.PAUSE){
             		mGameState = MainMap.READY;
             		mMainMap.setMode(mGameState);
-            		mMapView.resume();
-            		me.progressDialog.dismiss();
             		Log.i(MainMenu.TAG,"MSG_UNPAUSE");
             	}
             }
@@ -214,8 +216,10 @@ public class TetriBlastActivity extends Activity {
         mLinesToIncrease = 2;//TODO remove this
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
-        	//mMainMap.setMode(MainMap.READY);
-        	mHandler.sendEmptyMessage(MSG_PAUSE);
+        	if(mGameMode == MainMenu.MODE_SINGLE) {
+        		mMainMap.setMode(MainMap.READY);
+        	}else
+        		mHandler.sendEmptyMessage(MSG_PAUSE);
         } else {
             // We are being restored
             Bundle map = savedInstanceState.getBundle(ICICLE_KEY);
@@ -241,20 +245,92 @@ public class TetriBlastActivity extends Activity {
         super.onResume();
         // Pause the game along with the activity
         //mMainMap.setMode(mGameState);
-        mMapView.resume();
     }
     @Override
     protected void onStop() {
         super.onStop();
         // Stop the game along with the activity
         mMainMap.setMode(MainMap.PAUSE);
-        mMapView.pause();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         //Store the game state
         outState.putBundle(ICICLE_KEY, mMainMap.saveState());
+    }
+    
+    @Override
+    public void onBackPressed() {
+    	mHandler.sendEmptyMessage(MSG_PAUSE);
+    	if(mGameMode != MainMenu.MODE_SINGLE) 
+    		mBluetoothCon.write(BluetoothConnectivity.TYPE_PAUSE, null);
+    	showDialog(DIALOG_PAUSE);
+    }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+    	Dialog dialog = null;
+    	switch(id) {
+    	case DIALOG_PAUSE:
+    		dialog = createPauseDialog();
+    		break;
+    	case DIALOG_EXIT:
+    		dialog = createExitDialog();
+    		break;
+    	default:
+    		dialog = null;
+    	}
+    	return dialog;
+    }
+    
+    private Dialog createPauseDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Game Paused");
+    	builder.setMessage("You can exit or resume the game");
+    	builder.setCancelable(false);
+    	builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				me.finish();
+			}
+		})
+		.setNegativeButton("Resume", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
+				dialog.cancel();
+			}
+		});
+    	AlertDialog dialog = builder.create();
+    	return dialog;
+
+    }
+    
+    private Dialog createExitDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Exit Menu");
+    	builder.setMessage("The game stil running..");
+    	builder.setCancelable(false);
+    	builder.setPositiveButton("Pause", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				me.mHandler.sendEmptyMessage(MSG_PAUSE);
+			}
+		})
+		.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				me.finish();
+			}
+		})
+    	.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+    	AlertDialog dialog = builder.create();
+    	return dialog;
     }
     
     private void increaseScore(int linesCleared) {
