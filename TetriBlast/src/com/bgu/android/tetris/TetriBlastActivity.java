@@ -124,9 +124,10 @@ public class TetriBlastActivity extends Activity {
             case MSG_LINES_CLEARED:
                 Log.i(TAG, "TetrisBlastActivity msg: " + msg.what + "Lines Cleared: " + msg.arg1);
                 increaseScore(msg.arg1);
-                if (mGameMode == MainMenu.MODE_VS || mGameMode == MainMenu.MODE_COOP)
+                if (mGameMode != MainMenu.MODE_SINGLE) {//(mGameMode == MainMenu.MODE_VS || mGameMode == MainMenu.MODE_COOP)
                 	increaseLinesToSend(msg.arg1);
-                incraseLineToIncrease();
+                	incraseLineToIncrease();
+                }
                 break;
             case MSG_END_GAME:
             	Log.i(TAG, "GAME OVER!");
@@ -221,7 +222,7 @@ public class TetriBlastActivity extends Activity {
         linesToSend = 0;
         mCombo = 1;
         mTotalLinesSent = 0;
-        //mLinesToIncrease = 2;//TODO remove this
+        mLinesToIncrease = 0;
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	if(mGameMode == MainMenu.MODE_SINGLE) {
@@ -364,11 +365,14 @@ public class TetriBlastActivity extends Activity {
     
     private void increaseLinesToSend(int linesCleared) {
     	if (linesCleared == 0) {
-    		String stLines = Integer.toString(linesToSend);
-    		mBluetoothCon.write(BluetoothConnectivity.TYPE_LINES, stLines.getBytes());//send(linesToSend)//send via Bluetooth
-    		mTotalLinesSent += linesToSend;
-    		linesToSend = 0;
-    		
+    		if(linesToSend != 0){
+    			String stLines = Integer.toString(linesToSend);
+    			Log.i(MainMenu.TAG, "Line sent via BT: " + stLines);
+    			mBluetoothCon.write(BluetoothConnectivity.TYPE_LINES, stLines.getBytes());//send(linesToSend)//send via Bluetooth
+    			mTotalLinesSent += linesToSend;
+    			//TODO update screen lines sent
+    			linesToSend = 0;	
+    		}
     	}
     	else {
     		int temp = (linesCleared-1) + linesToSend;
