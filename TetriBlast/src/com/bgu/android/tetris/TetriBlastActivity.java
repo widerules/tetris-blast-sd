@@ -72,11 +72,9 @@ public class TetriBlastActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
             case BluetoothConnectivity.MESSAGE_READ:
-            	//TODO update name of opponet here
             	switch (msg.arg2) {
             	case BluetoothConnectivity.TYPE_NAME:
             		String opName = new String((byte[])msg.obj);
-            		//Log.i(MainMenu.TAG, "BT Received name: " + opName + " lenght: " + msg.arg1);
             		mOpponentName.setText(opName);
             		break;
             	case BluetoothConnectivity.TYPE_DIFFICULTY:
@@ -97,12 +95,18 @@ public class TetriBlastActivity extends Activity {
             		if(mDialog != null && mDialog.isShowing())
             			mDialog.cancel();
             		me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
-            		Log.i(MainMenu.TAG, "Sent unpause hendler message");
+            		//Log.i(MainMenu.TAG, "Sent unpause hendler message");
             		break;
             	case BluetoothConnectivity.TYPE_PAUSE:
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
             		showDialog(DIALOG_PAUSE);
-            		Log.i(MainMenu.TAG, "Sent pause hendler message");
+            		//Log.i(MainMenu.TAG, "Sent pause hendler message");
+            		break;
+            	case BluetoothConnectivity.TYPE_LINES://received lines to increase
+            		String stLines = new String((byte[])msg.obj);
+            		int lines = Integer.parseInt(stLines);
+            		mLinesToIncrease = lines;
+            		break;
             	}
             	break;
             	
@@ -216,7 +220,7 @@ public class TetriBlastActivity extends Activity {
         linesToSend = 0;
         mCombo = 1;
         mTotalLinesSent = 0;
-        mLinesToIncrease = 2;//TODO remove this
+        //mLinesToIncrease = 2;//TODO remove this
         if (savedInstanceState == null) {
             // We were just launched -- set up a new game
         	if(mGameMode == MainMenu.MODE_SINGLE) {
@@ -359,7 +363,8 @@ public class TetriBlastActivity extends Activity {
     
     private void increaseLinesToSend(int linesCleared) {
     	if (linesCleared == 0) {
-    		//send(linesToSend)//TODO send via Bluetooth
+    		String stLines = Integer.toString(linesToSend);
+    		mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, stLines.getBytes());//send(linesToSend)//send via Bluetooth
     		mTotalLinesSent += linesToSend;
     		linesToSend = 0;
     		
@@ -367,7 +372,8 @@ public class TetriBlastActivity extends Activity {
     	else {
     		int temp = (linesCleared-1) + linesToSend;
     		if (temp > MAX_LINES_TO_SEND) {
-    			//send(MAX_LINES)//TODO send via Bluetooth
+    			String stLines = Integer.toString(MAX_LINES_TO_SEND);
+        		mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, stLines.getBytes());//send(MAX_LINES)//send via Bluetooth
     			linesToSend = temp - MAX_LINES_TO_SEND;
     			mTotalLinesSent += MAX_LINES_TO_SEND;
     		}
