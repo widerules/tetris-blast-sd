@@ -99,6 +99,7 @@ public class TetriBlastActivity extends Activity {
             		break;
             	case BluetoothConnectivity.TYPE_PAUSE:
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
+            		showDialog(DIALOG_PAUSE);
             		Log.i(MainMenu.TAG, "Sent pause hendler message");
             	}
             	break;
@@ -297,6 +298,8 @@ public class TetriBlastActivity extends Activity {
 		.setNegativeButton("Resume", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				if(mGameMode != MainMenu.MODE_SINGLE)
+					mBluetoothCon.write(BluetoothConnectivity.TYPE_UNPAUSE, null);
 				me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
 				dialog.cancel();
 			}
