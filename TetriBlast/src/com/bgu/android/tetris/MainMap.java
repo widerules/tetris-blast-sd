@@ -123,9 +123,10 @@ public class MainMap {
 					Log.d(MainMenu.TAG,"Next: " + Integer.toString(randArr[1]));
 					//tempCount++;
 					if(!mapCur.putTetrinoOnMap(curTetrino)) {
-						Log.d(MainMenu.TAG, "Game Over!");
-						initNewGame();
-						mGameState = PAUSE;
+						mActivityHandler.sendEmptyMessage(TetriBlastActivity.MSG_END_GAME);
+						//Log.d(MainMenu.TAG, "Game Over!");
+						//initNewGame();
+						//mGameState = PAUSE;
 					}//intention no break
 				case MSG_TETRINO_MOVE:
 					update();

@@ -23,7 +23,7 @@ public class TetriBlastActivity extends Activity {
 	public TetriBlastActivity me = this;
 	public static final String TAG = "TetrisBlast";
 	public static final int DIALOG_PAUSE = 0;
-	public static final int DIALOG_EXIT = 1;
+	public static final int DIALOG_GAME_OVER = 1;
 	
 	private MapView mMapView;
 	private MainMap mMainMap;
@@ -56,6 +56,8 @@ public class TetriBlastActivity extends Activity {
    
     private int mGameMode;		//The mode of the game (vs, coop, single @ MainMenu.MODE_*)
     private long mCurrentScore;	//Curent score of the player
+    private long mOppScore;		//Received Opponent Score via bluetooth
+    private boolean mOppLost;	//Received opponent win or loos//TODO think if need this
     private int linesToSend;	//Num of lines to send via bluetooth
     private int mTotalLinesSent;//Total lines sent
     private int mCombo;			//Combo score multiplier
@@ -108,6 +110,19 @@ public class TetriBlastActivity extends Activity {
             		Log.i(MainMenu.TAG, "Received lines to increase: " + lines);
             		mLinesToIncrease = lines;
             		break;
+            	case BluetoothConnectivity.TYPE_SCORE:
+            		String stScore = new String((byte[])msg.obj);
+            		long score = Long.parseLong(stScore);
+            		Log.i(MainMenu.TAG, "Received opponent Score: " + score);
+            		mOppScore = score;
+            		break;
+            	case BluetoothConnectivity.TYPE_LOSS:
+            		//String isWinSt = new String((byte[])msg.obj);
+            		//boolean isWin = Boolean.parseBoolean(isWinSt);
+            		Log.i(MainMenu.TAG, "BT Received opponent lost: ");
+            		mOppLost = true;
+            		showDialog(DIALOG_GAME_OVER);     		
+            		break;
             	}
             	break;
             	
@@ -130,7 +145,15 @@ public class TetriBlastActivity extends Activity {
                 }
                 break;
             case MSG_END_GAME:
-            	Log.i(TAG, "GAME OVER!");
+            	Log.i(TAG, "TetrisBlastActivity: GAME OVER received");
+            	mGameState = MainMap.PAUSE;
+            	mMainMap.setMode(mGameState);
+            	if(mGameMode != MainMenu.MODE_SINGLE) {
+            		String myScore = Long.toString(mCurrentScore);
+            		mBluetoothCon.write(BluetoothConnectivity.TYPE_SCORE, myScore.getBytes());
+            		mBluetoothCon.write(BluetoothConnectivity.TYPE_LOSS, null);
+            	}
+            	showDialog(DIALOG_GAME_OVER);
             	break;
             case MSG_NEXT_PIC:
             	setNextPic(msg.arg1);
@@ -219,6 +242,8 @@ public class TetriBlastActivity extends Activity {
         	//mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
         }
         mCurrentScore = 0;
+        mOppScore = 0;
+        mOppLost = false;
         linesToSend = 0;
         mCombo = 1;
         mTotalLinesSent = 0;
@@ -283,8 +308,8 @@ public class TetriBlastActivity extends Activity {
     	case DIALOG_PAUSE:
     		mDialog = createPauseDialog();
     		break;
-    	case DIALOG_EXIT:
-    		mDialog = createExitDialog();
+    	case DIALOG_GAME_OVER:
+    		mDialog = createGameOverDialog();
     		break;
     	default:
     		mDialog = null;
@@ -317,30 +342,42 @@ public class TetriBlastActivity extends Activity {
 
     }
     
-    private Dialog createExitDialog() {
+    private Dialog createGameOverDialog() {
     	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	builder.setTitle("Exit Menu");
-    	builder.setMessage("The game stil running..");
+    	builder.setTitle("Game Over");
+    	if(mGameMode == MainMenu.MODE_SINGLE) {
+    		builder.setMessage("Score: " + mCurrentScore);
+    	}
+    	else {//TODO separate between Coop/VS
+    		String msg;
+    		if(mOppLost) {
+    			msg = "You WIN! Score: " + Long.toString(mCurrentScore);
+    		} else {
+    			msg = "You LOST! Score: " + Long.toString(mCurrentScore);
+    		}
+//    		if(mCurrentScore == mOppScore)
+//    			msg = "Draw! Score: " + Long.toString(mCurrentScore);
+//    		else if(mCurrentScore > mOppScore)
+//    			msg = "You WIN! Score: " + Long.toString(mCurrentScore);
+//    		else
+//    			msg = "You LOST! Score: " + Long.toString(mCurrentScore);
+    		builder.setMessage(msg);
+    	}
     	builder.setCancelable(false);
-    	builder.setPositiveButton("Pause", new DialogInterface.OnClickListener() {
+    	builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				me.mHandler.sendEmptyMessage(MSG_PAUSE);
-			}
-		})
-		.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				me.finish();
-			}
-		})
-    	.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.cancel();
+				//updateScore(mCurrentScore, mode);//TODO implement
+				if(mGameMode == MainMenu.MODE_SINGLE) {
+					me.finish();
+				} else {
+					//TODO implement this for multiplayer mode
+					me.finish();
+				}
+				
 			}
 		});
-    	AlertDialog dialog = builder.create();
+		AlertDialog dialog = builder.create();
     	return dialog;
     }
     
