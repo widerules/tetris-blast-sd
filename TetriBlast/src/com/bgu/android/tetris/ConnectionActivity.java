@@ -1,9 +1,12 @@
 package com.bgu.android.tetris;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,6 +27,9 @@ public class ConnectionActivity extends Activity {
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_JOIN_DEVICE = 3;
     
+    // Dialog IDs
+    public static final int DIALOG_MAKING_CONNECT = 0;
+	public static final int DIALOG_CONNECTED = 1;
     
     // Member object for the chat services
     private BluetoothConnectivity mBTconnection = null;
@@ -31,8 +37,8 @@ public class ConnectionActivity extends Activity {
 	// Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     
-    public ProgressDialog mProgresDialog;
-    
+    //public ProgressDialog mProgresDialog;
+    private Dialog mStatusDialog;
     // Name of the connected device
     private String mConnectedDeviceName = null;
     
@@ -45,8 +51,9 @@ public class ConnectionActivity extends Activity {
                 Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                 switch (msg.arg1) {
                 case BluetoothConnectivity.STATE_CONNECTED:
-                	me.mProgresDialog.dismiss();
-                	me.mProgresDialog = ProgressDialog.show(me, "Device Conected!", "Whaiting for Host start a game");
+                	me.mStatusDialog.dismiss();
+                	showDialog(DIALOG_CONNECTED);
+                	//me.mProgresDialog = ProgressDialog.show(me, "Device Conected!", "Whaiting for Host start a game");
                 	
 //                	Intent intt = new Intent(me, NewGameActivity.class);
 //					startActivity(intt);
@@ -72,7 +79,7 @@ public class ConnectionActivity extends Activity {
                 //String readMessage = new String(readBuf, 0, msg.arg1);
                 //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
                 if (type == BluetoothConnectivity.TYPE_START) {
-                	me.mProgresDialog.dismiss();
+                	me.mStatusDialog.dismiss();
                 	Toast.makeText(me, "Host started a game", Toast.LENGTH_SHORT);
                 	Intent intt = new Intent(me, TetriBlastActivity.class);
 					startActivity(intt);
@@ -190,7 +197,8 @@ public class ConnectionActivity extends Activity {
                 BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
                 // Attempt to connect to the device
         		mBTconnection.connect(device);
-        		me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
+        		showDialog(DIALOG_MAKING_CONNECT);
+        		//me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
         	}
         }
     }
@@ -219,13 +227,59 @@ public class ConnectionActivity extends Activity {
     	super.onStop();
     }
     
-//    private void setupChat() {
-//        Log.d(TAG, "setupChat()");
-//
-//        //sendMessage(message);
-//        
-//        // Initialize the BluetoothChatService to perform bluetooth connections
-//        //mChatService = new BluetoothMsgService(this, mHandler);
-//    }
+    @Override
+    protected Dialog onCreateDialog(int id) {
+    	mStatusDialog = null;
+    	switch(id) {
+    	case DIALOG_MAKING_CONNECT:
+    		mStatusDialog = createMakingConnectDialog();
+    		break;
+    	case DIALOG_CONNECTED:
+    		mStatusDialog = createConnectedDialog();
+    		break;
+    	default:
+    		mStatusDialog = null;
+    	}
+    	return mStatusDialog;
+    }
+    
+    private Dialog createMakingConnectDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Bluetooth Connection...");
+    	builder.setMessage("Making Bluetooth connection");
+    	builder.setCancelable(false);
+    	builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mBTconnection.stop();
+				mStatusDialog.dismiss();
+				
+			}
+		});
+
+    	AlertDialog dialog = builder.create();
+    	return dialog;
+
+    }
+    
+    private Dialog createConnectedDialog() {
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	builder.setTitle("Device Conected!");
+    	builder.setMessage("Whaiting for Host start the game");
+    	builder.setCancelable(false);
+    	builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				mBTconnection.stop();
+				mStatusDialog.dismiss();
+				
+			}
+		});
+
+    	AlertDialog dialog = builder.create();
+    	return dialog;
+
+    }
+
 
 }
