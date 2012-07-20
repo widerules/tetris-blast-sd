@@ -61,10 +61,6 @@ public class BluetoothConnectivity {
 	
     private int mState;
     
-    //shared parameters of the multiplay game
-    private int mDifficulty;
-    private boolean mWithShadow;
-    
     //private constructor of singleton class
 	private BluetoothConnectivity(Context context){
 		//TODO initialize local variables
@@ -180,7 +176,8 @@ public class BluetoothConnectivity {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
-        setState(STATE_LISTEN);
+        stop();
+    	//setState(STATE_LISTEN);
 
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_TOAST);
@@ -194,7 +191,8 @@ public class BluetoothConnectivity {
      * Indicate that the connection was lost and notify the UI Activity.
      */
     private void connectionLost() {
-        setState(STATE_LISTEN);
+        stop();
+    	//setState(STATE_LISTEN);
 
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_TOAST);

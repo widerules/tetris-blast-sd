@@ -57,6 +57,8 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
                     break;
                 case BluetoothConnectivity.STATE_NONE:
                 	showStatus();
+                	startBtn.setEnabled(false);
+                	mBluetoothCon.startListen();
                 	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
                     break;
                 }
