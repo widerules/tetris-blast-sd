@@ -62,7 +62,7 @@ public class ConnectionActivity extends Activity {
                 case BluetoothConnectivity.STATE_LISTEN:
                 	break;
                 case BluetoothConnectivity.STATE_NONE:
-                	if(me.mStatusDialog.isShowing()){
+                	if(me.mStatusDialog != null && me.mStatusDialog.isShowing()){
                 		me.mStatusDialog.dismiss();
                 	}
                 	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
