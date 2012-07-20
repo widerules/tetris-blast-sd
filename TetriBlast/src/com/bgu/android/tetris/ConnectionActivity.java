@@ -142,19 +142,18 @@ public class ConnectionActivity extends Activity {
 	            startActivityForResult(serverIntent, REQUEST_JOIN_DEVICE);
 			}
 		});
-        //Get Bluetooth Connectivity singleton 
-        mBTconnection = BluetoothConnectivity.getInstance(me);
-        mBTconnection.setHandler(mHandler);
-        
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
+        
+        //Get Bluetooth Connectivity singleton 
+        mBTconnection = BluetoothConnectivity.getInstance(me);
         
     }
     
@@ -214,6 +213,7 @@ public class ConnectionActivity extends Activity {
     @Override
     public void onStart() {
         super.onStart();
+        Log.d(TAG, "Connection Activity Started");
         // If BT is not on, request that it be enabled.
         // setupChat() will then be called during onActivityResult
         if (!mBluetoothAdapter.isEnabled()) {
@@ -224,6 +224,7 @@ public class ConnectionActivity extends Activity {
         	//setupChat();
             //TODO chesk thisif (mChatService == null) setupChat();
         }
+      mBTconnection.setHandler(mHandler);
     }
 
     @Override
