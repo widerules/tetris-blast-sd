@@ -116,6 +116,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         	multiLayout.setVisibility(View.VISIBLE);
         	statusTxt.setVisibility(View.VISIBLE);
         	startBtn.setEnabled(false);
+        	mBluetoothCon.stop();
         	showStatus();
         	boolean temp;
         	if (profileDb.getGameMode() == MainMenu.MODE_COOP)
