@@ -97,7 +97,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         
         if(mIsHost) {
         	mBluetoothCon = BluetoothConnectivity.getInstance(this);
-        	mBluetoothCon.setHandler(mHandler);
+        	//mBluetoothCon.setHandler(mHandler);
         }
         	
         startBtn = (Button)findViewById(R.id.btn_newgame_start);
@@ -146,6 +146,7 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         	else
         		temp = false;
         	coopChk.setChecked(temp);
+        	mBluetoothCon.setHandler(mHandler);
         	//Start Listening on Bluetooth connection
         	mBluetoothCon.startListen();
         }
