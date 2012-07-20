@@ -227,6 +227,11 @@ public class BluetoothConnectivity {
         	out[0] = (byte)type;
         	r.write(out);
         }
+        try {
+        	r.wait(50);
+        }catch (InterruptedException e) {
+        	Log.e(TAG,e.toString());
+        }
         r.write(out);// Perform the write unsynchronized
     }
     
