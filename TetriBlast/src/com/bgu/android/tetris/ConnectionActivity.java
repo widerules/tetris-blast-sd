@@ -26,6 +26,7 @@ public class ConnectionActivity extends Activity {
     private static final int REQUEST_DISCOVER_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
     private static final int REQUEST_JOIN_DEVICE = 3;
+    private static final int REQUEST_JOIN_THE_GAME = 4;
     
     // Dialog IDs
     public static final int DIALOG_MAKING_CONNECT = 0;
@@ -82,7 +83,7 @@ public class ConnectionActivity extends Activity {
                 	me.mStatusDialog.dismiss();
                 	Toast.makeText(me, "Host started a game", Toast.LENGTH_SHORT);
                 	Intent intt = new Intent(me, TetriBlastActivity.class);
-					startActivity(intt);
+                	startActivityForResult(intt, REQUEST_JOIN_THE_GAME);
                 }
                 break;
             case BluetoothConnectivity.MESSAGE_DEVICE_NAME:
@@ -199,7 +200,15 @@ public class ConnectionActivity extends Activity {
         		mBTconnection.connect(device);
         		showDialog(DIALOG_MAKING_CONNECT);
         		//me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
+        		break;
         	}
+        case REQUEST_JOIN_THE_GAME:
+        	if(resultCode == Activity.RESULT_OK) {//Devices still connected
+        		showDialog(DIALOG_CONNECTED);
+        	}
+        	else 
+        		if(mStatusDialog.isShowing())
+        			mStatusDialog.dismiss();
         }
     }
     @Override
@@ -258,6 +267,7 @@ public class ConnectionActivity extends Activity {
 		});
 
     	AlertDialog dialog = builder.create();
+    	mBTconnection.setHandler(mHandler);
     	return dialog;
 
     }
