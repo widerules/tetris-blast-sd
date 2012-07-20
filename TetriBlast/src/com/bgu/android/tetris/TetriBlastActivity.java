@@ -170,6 +170,11 @@ public class TetriBlastActivity extends Activity {
             	if(mIamHost) {
             		mBluetoothCon.write(BluetoothConnectivity.TYPE_DIFFICULTY, myDiff.getBytes());
                 	Log.i(MainMenu.TAG, "Sent via BT difficult: " + myDiff);
+                	try {//TODO check how can delay BT transfer
+                		me.wait(50);
+                	}catch (InterruptedException e) {
+                		Log.e(TAG,e.toString());
+                	}
                 	mBluetoothCon.write(BluetoothConnectivity.TYPE_SHADOW, myShadow.getBytes());
                 	Log.i(MainMenu.TAG, "Sent via BT shadow: " + myShadow);
             	}
