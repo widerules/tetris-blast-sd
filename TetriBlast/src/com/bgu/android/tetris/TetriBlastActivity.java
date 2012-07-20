@@ -121,6 +121,7 @@ public class TetriBlastActivity extends Activity {
             		//boolean isWin = Boolean.parseBoolean(isWinSt);
             		Log.i(MainMenu.TAG, "BT Received opponent lost: ");
             		mOppLost = true;
+            		me.mHandler.sendEmptyMessage(MSG_PAUSE);
             		showDialog(DIALOG_GAME_OVER);     		
             		break;
             	}
@@ -368,12 +369,13 @@ public class TetriBlastActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 				//updateScore(mCurrentScore, mode);//TODO implement
-				if(mGameMode == MainMenu.MODE_SINGLE) {
-					me.finish();
-				} else {
-					//TODO implement this for multiplayer mode
-					me.finish();
-				}
+//				if(mGameMode == MainMenu.MODE_SINGLE) {
+//					me.finish();
+//				} else {
+//					//TODO implement this for multiplayer mode
+//					me.finish();
+//				}
+				me.finish();
 				
 			}
 		});
