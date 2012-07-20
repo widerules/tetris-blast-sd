@@ -326,6 +326,8 @@ public class TetriBlastActivity extends Activity {
     	builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
+				if(mGameMode != MainMenu.MODE_SINGLE)
+					mBluetoothCon.write(BluetoothConnectivity.TYPE_LOSS, null);
 				me.finish();
 			}
 		})
