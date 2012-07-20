@@ -44,7 +44,7 @@ public class BluetoothConnectivity {
     public static final int TYPE_SCORE = 2;
     public static final int TYPE_START = 3;
     public static final int TYPE_GAME_STATE = 4;
-    public static final int TYPE_WIN_LOSS = 5;
+    public static final int TYPE_LOSS = 5;
     public static final int TYPE_NAME = 6;
     public static final int TYPE_DIFFICULTY = 7;//BT message type that set the difficulty of the game
     public static final int TYPE_SHADOW = 8;//BT message type that set shadow on/off
