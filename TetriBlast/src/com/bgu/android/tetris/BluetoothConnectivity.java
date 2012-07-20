@@ -228,10 +228,11 @@ public class BluetoothConnectivity {
         	r.write(out);
         }
         try {
-        	r.wait(50);
-        }catch (InterruptedException e) {
-        	Log.e(TAG,e.toString());
-        }
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         r.write(out);// Perform the write unsynchronized
     }
     
