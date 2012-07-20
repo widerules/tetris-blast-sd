@@ -22,6 +22,8 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 	public static final String DIFFICULTY = "difficulty";
 	public static final String SHADOW = "shadow";
 	public static final String HOST = "host";
+	public static final int WHATCH_DOG = 1;
+	public static final long WHATCH_DOG_TIMEOUT = 1000;//1 sec timeout
 	
 	protected Profile profileDb = Profile.getInstance(this);
 	private TextView profileName;
@@ -33,7 +35,8 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 	private TextView statusTxt;
 	private RelativeLayout multiLayout;
 	private SharedPreferences ref;
-	protected BluetoothConnectivity mBluetoothCon = BluetoothConnectivity.getInstance(this);
+	protected BluetoothConnectivity mBluetoothCon;
+	private boolean mIsHost = false;
 	
 	// The Handler that gets information back from the BluetoothConnectivity
     private final Handler mHandler = new Handler() {
@@ -66,13 +69,37 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
             }
         }
     };
-	
+    
+    private final Handler mWathchDog = new Handler() {
+    	 @Override
+         public void handleMessage(Message msg) {
+             switch (msg.what) {
+             case WHATCH_DOG:
+            	 if(mIsHost && mBluetoothCon.getState() == BluetoothConnectivity.STATE_NONE){
+            	 	 mBluetoothCon.stop();
+            	 	 showStatus();
+            	 	 mBluetoothCon.startListen();
+            	 } 
+             }
+             mWathchDog.sendEmptyMessageDelayed(WHATCH_DOG, WHATCH_DOG_TIMEOUT);//every 1 sec checking connection status
+    	 }
+    };
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_game);
-        mBluetoothCon.setHandler(mHandler);
+        ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+        if(ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_SINGLE) == MainMenu.MODE_SINGLE)
+        	mIsHost = false;
+        else
+        	mIsHost = true;
+        
+        if(mIsHost) {
+        	mBluetoothCon = BluetoothConnectivity.getInstance(this);
+        	mBluetoothCon.setHandler(mHandler);
+        }
+        	
         startBtn = (Button)findViewById(R.id.btn_newgame_start);
         diffLevel = (SeekBar)findViewById(R.id.seekb_newgame_difficulty);
         diffLevel.setOnSeekBarChangeListener(this);
@@ -87,7 +114,10 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
 			@Override
 			public void onClick(View v) {
 				saveActivitySettings();
-				mBluetoothCon.write(BluetoothConnectivity.TYPE_START, null);
+				 if(mIsHost) {
+					 mWathchDog.sendEmptyMessageDelayed(WHATCH_DOG, WHATCH_DOG_TIMEOUT);
+					 mBluetoothCon.write(BluetoothConnectivity.TYPE_START, null);
+				 }
 				Intent intt = new Intent(me, TetriBlastActivity.class);
 				startActivity(intt);
 				}    
@@ -97,22 +127,14 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
     public void onStart()
     {
     	super.onStart();
-    	ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
+    	//ref = getSharedPreferences(MainMenu.PREF_TAG, MODE_PRIVATE);
         profileDb.loadProfileById(ref.getString(MainMenu.PROFILE_ID, null));
         diffLevel.setOnSeekBarChangeListener(this);
         profileName.setText("Profile: " +profileDb.getName());
         diffTxt.setText(getString(R.string.difficult) + "  " +Integer.toString(profileDb.getDifficulty()));
         diffLevel.setProgress(profileDb.getDifficulty());
         shadowChk.setChecked(profileDb.isShadow());
-        switch (ref.getInt(MainMenu.GAME_MODE, MainMenu.MODE_UNDEFINED))
-        {
-        case MainMenu.MODE_UNDEFINED:
-        	break;
-        case MainMenu.MODE_SINGLE:
-        	break;
-        case MainMenu.MODE_COOP:
-        case MainMenu.MODE_VS:
-        case MainMenu.MODE_MULTY:
+        if(mIsHost){
         	multiLayout.setVisibility(View.VISIBLE);
         	statusTxt.setVisibility(View.VISIBLE);
         	startBtn.setEnabled(false);
@@ -120,17 +142,15 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         	showStatus();
         	boolean temp;
         	if (profileDb.getGameMode() == MainMenu.MODE_COOP)
-        		temp =true;
+        		temp = true;
         	else
         		temp = false;
         	coopChk.setChecked(temp);
-        	break;
-        default:
-        	break;
+        	//Start Listening on Bluetooth connection
+        	mBluetoothCon.startListen();
         }
-        //Start Listening on Bluetooth connection
-        mBluetoothCon.startListen();
     }
+    
 	private void showStatus() {
 		if (mBluetoothCon.getState() == BluetoothConnectivity.STATE_CONNECTED)
     	{

@@ -151,14 +151,7 @@
             android:paddingLeft="50dip"
             android:paddingRight="50dip"
             android:text="Start" />
-        <Button
-            android:id="@+id/btn_newgame_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingLeft="50dip"
-            android:paddingRight="50dip"
-            android:text="Back" />
+        
 
     </LinearLayout>
 </LinearLayout>
