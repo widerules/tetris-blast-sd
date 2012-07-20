@@ -119,9 +119,11 @@ public class TetriBlastActivity extends Activity {
             	case BluetoothConnectivity.TYPE_LOSS:
             		//String isWinSt = new String((byte[])msg.obj);
             		//boolean isWin = Boolean.parseBoolean(isWinSt);
-            		Log.i(MainMenu.TAG, "BT Received opponent lost: ");
+            		Log.i(MainMenu.TAG, "BT Received opponent - lost");
             		mOppLost = true;
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
+            		if(me.mDialog.isShowing())
+            			me.mDialog.dismiss();
             		showDialog(DIALOG_GAME_OVER);     		
             		break;
             	}

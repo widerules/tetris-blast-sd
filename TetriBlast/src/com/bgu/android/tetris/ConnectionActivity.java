@@ -3,7 +3,6 @@ package com.bgu.android.tetris;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
@@ -20,7 +19,7 @@ import android.widget.Toast;
 
 public class ConnectionActivity extends Activity {
 	final ConnectionActivity me = this;
-	public static final String TAG = "TetrisBlast";
+	public static final String TAG = MainMenu.TAG;
     
 	 // Intent request codes
     private static final int REQUEST_DISCOVER_DEVICE = 1;
@@ -38,11 +37,13 @@ public class ConnectionActivity extends Activity {
 	// Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     
-    //public ProgressDialog mProgresDialog;
+    //Status Dialogs Holder
     private Dialog mStatusDialog;
+    
     // Name of the connected device
     private String mConnectedDeviceName = null;
     
+    private boolean mTetrisNotStarted;
     // The Handler that gets information back from the BluetoothConnectivity
     private final Handler mHandler = new Handler() {
         @Override
@@ -54,34 +55,27 @@ public class ConnectionActivity extends Activity {
                 case BluetoothConnectivity.STATE_CONNECTED:
                 	me.mStatusDialog.dismiss();
                 	showDialog(DIALOG_CONNECTED);
-                	//me.mProgresDialog = ProgressDialog.show(me, "Device Conected!", "Whaiting for Host start a game");
-                	
-//                	Intent intt = new Intent(me, NewGameActivity.class);
-//					startActivity(intt);
-                    break;
+                	break;
                 case BluetoothConnectivity.STATE_CONNECTING:
                 	Toast.makeText(me, "Connecting...", Toast.LENGTH_SHORT);
                     break;
                 case BluetoothConnectivity.STATE_LISTEN:
+                	break;
                 case BluetoothConnectivity.STATE_NONE:
+                	if(me.mStatusDialog.isShowing()){
+                		me.mStatusDialog.dismiss();
+                	}
                 	Toast.makeText(me, "Not connected :(", Toast.LENGTH_SHORT);
                     break;
                 }
                 break;
-//            case MESSAGE_WRITE:
-//                byte[] writeBuf = (byte[]) msg.obj;
-//                // construct a string from the buffer
-//                String writeMessage = new String(writeBuf);
-//                mConversationArrayAdapter.add("Me:  " + writeMessage);
-//                break;
+            //Received message on Bluetooth
             case BluetoothConnectivity.MESSAGE_READ:
                 int type = msg.arg2;
-                // construct a string from the valid bytes in the buffer
-                //String readMessage = new String(readBuf, 0, msg.arg1);
-                //mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
-                if (type == BluetoothConnectivity.TYPE_START) {
+                if (type == BluetoothConnectivity.TYPE_START && mTetrisNotStarted) {
                 	me.mStatusDialog.dismiss();
-                	Toast.makeText(me, "Host started a game", Toast.LENGTH_SHORT);
+                	Log.i(MainMenu.TAG, "BT Received: Host started a game");
+                	mTetrisNotStarted = false;
                 	Intent intt = new Intent(me, TetriBlastActivity.class);
                 	startActivityForResult(intt, REQUEST_JOIN_THE_GAME);
                 }
@@ -106,16 +100,13 @@ public class ConnectionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection);
         Log.d(TAG, "Connection Activity Created");
-        //getWindow().setBackgroundDrawableResource(R.drawable.tetris_bg);//Draw background
         Button hostBtn = (Button)findViewById(R.id.btn_host);
         Button joinBtn = (Button)findViewById(R.id.btn_join);
-                
+        mTetrisNotStarted = true;        
         hostBtn.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "ensure discoverable");
-				//TODO pass parameter Game Mode to TetrisBalst Activity
 				if (mBluetoothAdapter.getScanMode() !=
 						BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 					Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -144,22 +135,19 @@ public class ConnectionActivity extends Activity {
 		});
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        
         // If the adapter is null, then Bluetooth is not supported
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
-        
         //Get Bluetooth Connectivity singleton 
         mBTconnection = BluetoothConnectivity.getInstance(me);
-        
     }
     
     @Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult " + resultCode);
+        Log.d(TAG, "Request code: " + requestCode+ " received Activity Result: " + resultCode);
         switch (requestCode) {
         case REQUEST_DISCOVER_DEVICE:
           	// When the request to enable Bluetooth returns
@@ -170,7 +158,8 @@ public class ConnectionActivity extends Activity {
 				ed.commit();
             	Intent intt = new Intent(me, NewGameActivity.class);
 				startActivity(intt);
-            } else {
+            } 
+            else {
                 // User did not enable Bluetooth or an error occured
                 Log.d(TAG, "Device not Discoverable");
                 Toast.makeText(this, "Device not Discoverable" , Toast.LENGTH_SHORT).show();
@@ -178,11 +167,7 @@ public class ConnectionActivity extends Activity {
             break;
         case REQUEST_ENABLE_BT:
             // When the request to enable Bluetooth returns
-            if (resultCode == Activity.RESULT_OK) {
-                // Bluetooth is now enabled, so set up a chat session
-            	//TODO check BT enabled flag
-                //me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
-            } else {
+            if (resultCode != Activity.RESULT_OK) {
                 // User did not enable Bluetooth or an error occured
                 Log.d(TAG, "BT not enabled");
                 Toast.makeText(this, "BT not enabled" , Toast.LENGTH_SHORT).show();
@@ -198,7 +183,6 @@ public class ConnectionActivity extends Activity {
                 // Attempt to connect to the device
         		mBTconnection.connect(device);
         		showDialog(DIALOG_MAKING_CONNECT);
-        		//me.mProgresDialog = ProgressDialog.show(me, "Bluetooth Connection ...", "Making Bluetooth connection");
         		break;
         	}
         case REQUEST_JOIN_THE_GAME:
@@ -214,17 +198,13 @@ public class ConnectionActivity extends Activity {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "Connection Activity Started");
-        // If BT is not on, request that it be enabled.
-        // setupChat() will then be called during onActivityResult
+        mTetrisNotStarted = true;
+        // If BT is disabled, start enable request.
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
-        // Otherwise, setup the chat session
-        } else {
-        	//setupChat();
-            //TODO chesk thisif (mChatService == null) setupChat();
         }
-      mBTconnection.setHandler(mHandler);
+        mBTconnection.setHandler(mHandler);
     }
 
     @Override
@@ -289,8 +269,5 @@ public class ConnectionActivity extends Activity {
 
     	AlertDialog dialog = builder.create();
     	return dialog;
-
     }
-
-
 }
