@@ -136,19 +136,21 @@ public class NewGameActivity extends Activity implements SeekBar.OnSeekBarChange
         shadowChk.setChecked(profileDb.isShadow());
         if(mIsHost){
         	multiLayout.setVisibility(View.VISIBLE);
-        	statusTxt.setVisibility(View.VISIBLE);
-        	startBtn.setEnabled(false);
-        	mBluetoothCon.stop();
-        	showStatus();
-        	boolean temp;
-        	if (profileDb.getGameMode() == MainMenu.MODE_COOP)
-        		temp = true;
-        	else
-        		temp = false;
-        	coopChk.setChecked(temp);
-        	mBluetoothCon.setHandler(mHandler);
-        	//Start Listening on Bluetooth connection
-        	mBluetoothCon.startListen();
+        	statusTxt.setVisibility(View.VISIBLE);       	
+        	if(mBluetoothCon.getState() != BluetoothConnectivity.STATE_CONNECTED){//still connected
+        		startBtn.setEnabled(false);	
+        		mBluetoothCon.stop();
+        		showStatus();
+        		boolean temp;
+        		if (profileDb.getGameMode() == MainMenu.MODE_COOP)
+        			temp = true;
+        		else
+        			temp = false;
+        		coopChk.setChecked(temp);
+        		mBluetoothCon.setHandler(mHandler);
+        		//Start Listening on Bluetooth connection
+        		mBluetoothCon.startListen();
+        	}
         }
     }
     
