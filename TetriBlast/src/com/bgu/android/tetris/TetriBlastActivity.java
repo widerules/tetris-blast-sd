@@ -122,7 +122,7 @@ public class TetriBlastActivity extends Activity {
             		Log.i(MainMenu.TAG, "BT Received opponent - lost");
             		mOppLost = true;
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
-            		if(me.mDialog.isShowing())
+            		if(me.mDialog != null && me.mDialog.isShowing())
             			me.mDialog.dismiss();
             		showDialog(DIALOG_GAME_OVER);     		
             		break;
