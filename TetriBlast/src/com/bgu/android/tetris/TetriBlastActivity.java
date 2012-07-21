@@ -203,8 +203,6 @@ public class TetriBlastActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.d(TAG, "Create main layout");
-        mBluetoothCon = BluetoothConnectivity.getInstance(this);
-        mBluetoothCon.setHandler(mBtHandler);
         mMapView = (MapView)findViewById(R.id.tetris);
         mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
         mMainMap = new MainMap(this, mMapView);
@@ -237,6 +235,8 @@ public class TetriBlastActivity extends Activity {
         	mNameLine.setVisibility(View.GONE);
         }
         else {
+        	 mBluetoothCon = BluetoothConnectivity.getInstance(this);
+             mBluetoothCon.setHandler(mBtHandler);
         	Cursor cursor = profileDb.queryById(ref.getString(MainMenu.PROFILE_ID, null));
     		cursor.moveToFirst();
     		String name = cursor.getString(cursor.getColumnIndex(Profile.NAME));
@@ -270,6 +270,12 @@ public class TetriBlastActivity extends Activity {
         mMapView.setOnTouchListener(mMainMap.mTouchListener);
     }
 
+//    @Override
+//    protected void onStart() {
+//    	super.onStart();
+//    	//mBluetoothCon.setHandler(mBtHandler);
+//    }
+    
     @Override
     protected void onPause() {
         super.onPause();
