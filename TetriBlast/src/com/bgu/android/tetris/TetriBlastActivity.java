@@ -97,12 +97,12 @@ public class TetriBlastActivity extends Activity {
             		if(mDialog != null && mDialog.isShowing())
             			mDialog.cancel();
             		me.mHandler.sendEmptyMessage(MSG_UNPAUSE);
-            		//Log.i(MainMenu.TAG, "Sent unpause hendler message");
+            		Log.i(MainMenu.TAG, "Sent BT unpause hendler message");
             		break;
             	case BluetoothConnectivity.TYPE_PAUSE:
             		me.mHandler.sendEmptyMessage(MSG_PAUSE);
             		showDialog(DIALOG_PAUSE);
-            		//Log.i(MainMenu.TAG, "Sent pause hendler message");
+            		Log.i(MainMenu.TAG, "Sent BT pause hendler message");
             		break;
             	case BluetoothConnectivity.TYPE_LINES://received lines to increase
             		String stLines = new String((byte[])msg.obj);
