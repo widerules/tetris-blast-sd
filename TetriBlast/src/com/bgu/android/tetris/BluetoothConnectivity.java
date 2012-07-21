@@ -428,7 +428,7 @@ public class BluetoothConnectivity {
                     if (bytes > 0) {
                     	bytesSplited = byteSplit(buffer, DELIMITER);//split byte array by deliiter
                     	
-                    	for(int j = 0; j < bytesSplited.length && bytesSplited[j].length > 1; j++){
+                    	for(int j = 0; j < bytesSplited.length && bytesSplited[j].length > 0; j++){
                     		dataBuff = new byte[bytesSplited[j].length-1];
                     		//copy only data without first type byte
                     		System.arraycopy(bytesSplited[j], 1, dataBuff, 0, dataBuff.length);
