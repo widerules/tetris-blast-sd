@@ -42,6 +42,7 @@ public class TetriBlastActivity extends Activity {
     public static final int MSG_UPDATE = 4;
     public static final int MSG_PAUSE = 5;
     public static final int MSG_UNPAUSE = 6;
+    //public static final int MSG_MUSIC_BG = 7; 
         
     public static final int GAME_STATUS_PROGRESS = 0;
     public static final int GAME_STATUS_WIN = 1;
@@ -187,6 +188,10 @@ public class TetriBlastActivity extends Activity {
             		mMainMap.setMode(mGameState);
             		Log.i(MainMenu.TAG,"MSG_UNPAUSE");
             	}
+            	break;
+//            case MSG_MUSIC_BG:
+//            	SoundManager.getInstance(me).playSound(4);//play bgMusic on the begining
+//            	break;
             }
         }
 
@@ -242,7 +247,7 @@ public class TetriBlastActivity extends Activity {
     		String name = cursor.getString(cursor.getColumnIndex(Profile.NAME));
     		mMyName.setText(name);
     		mHandler.sendEmptyMessageDelayed(MSG_UPDATE, 500);
-        	//mBluetoothCon.write(BluetoothConnectivity.TYPE_NAME, name.getBytes());
+    		
         }
         mCurrentScore = 0;
         mOppScore = 0;
@@ -268,6 +273,7 @@ public class TetriBlastActivity extends Activity {
         }
         
         mMapView.setOnTouchListener(mMainMap.mTouchListener);
+        //mHandler.sendEmptyMessageDelayed(MSG_MUSIC_BG, 3000);
     }
 
 //    @Override

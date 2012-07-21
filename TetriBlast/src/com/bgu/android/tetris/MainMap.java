@@ -42,9 +42,11 @@ public class MainMap {
 	public static final int MAX_DIFFICULTY = 10;
 	public static final int MSG_ROUND_BEGIN = 1;
 	public static final int MSG_TETRINO_MOVE = 0;
+	public static final int MSG_MUSIC_BG = 2;
 	
 	private MapView mMapView;
-		
+	private Context mContext;
+	//private SoundManager mSound;
 	/**
 	 * This is speed parameter of the game
 	 */
@@ -111,6 +113,9 @@ public class MainMap {
 					mapCur.copyFrom(mapLast);
 					int linesCleared = mapCur.lineCheckAndClear();
 					//Log.d(TAG, "Cleared " + Integer.toString(i) + " lines!");
+					if (linesCleared > 0) {
+						SoundManager.getInstance(mContext).playSound(SoundManager.SOUND_LINE_BREAK);
+					}
 					mActivityHandler.obtainMessage(TetriBlastActivity.MSG_LINES_CLEARED, linesCleared, -1).sendToTarget();
 					
 					mapOld.copyFrom(mapCur);
@@ -134,6 +139,8 @@ public class MainMap {
 					mapCur.copyFrom(mapOld);
 					gameMove();
 					break;
+				case MSG_MUSIC_BG:
+					SoundManager.getInstance(mContext).playBgMusic();//TODO bug!!! wont play sound
 				}
 			}else {//If not ready (on Pause)
 				this.sendEmptyMessageDelayed(msg.what, 500);
@@ -160,6 +167,8 @@ public class MainMap {
 		mapCur = new TetrinoMap();
 		mapOld = new TetrinoMap();
 		mapLast = new TetrinoMap();
+		//mSound  = SoundManager.getInstance(context);
+		mContext = context;
 		needToAddLines = 0;
 	}
 	
@@ -171,6 +180,7 @@ public class MainMap {
 		mapOld.resetMap();
 		mapLast.resetMap();
 		mRedrawHandler.sendEmptyMessage(MSG_ROUND_BEGIN);
+		mRedrawHandler.sendEmptyMessageDelayed(MSG_MUSIC_BG, 700);
 	}
 	
 	private Tetrino newTetrino(int type, int x, int y) {
@@ -351,6 +361,7 @@ public class MainMap {
 								mapCur.resetMap();
 								mapCur.copyFrom(mapOld);
 								curTetrino.drop(mapCur);
+								SoundManager.getInstance(mContext).playSound(SoundManager.SOUND_FAST_DROP);
 								mapCur.putTetrinoOnMap(curTetrino);
 								update();
 								mRedrawHandler.removeMessages(MSG_TETRINO_MOVE);
@@ -362,6 +373,7 @@ public class MainMap {
 								mapCur.copyFrom(mapOld);
 								curTetrino.rotateTetrino(mapCur);
 								mapCur.putTetrinoOnMap(curTetrino);
+								SoundManager.getInstance(mContext).playSound(SoundManager.SOUND_TURN);
 								update();
 							}
 						}
