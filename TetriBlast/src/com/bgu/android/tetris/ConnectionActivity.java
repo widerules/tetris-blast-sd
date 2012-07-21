@@ -43,7 +43,8 @@ public class ConnectionActivity extends Activity {
     // Name of the connected device
     private String mConnectedDeviceName = null;
     
-    private boolean mTetrisNotStarted;
+    //private boolean mTetrisNotStarted;
+    
     // The Handler that gets information back from the BluetoothConnectivity
     private final Handler mHandler = new Handler() {
         @Override
@@ -72,10 +73,10 @@ public class ConnectionActivity extends Activity {
             //Received message on Bluetooth
             case BluetoothConnectivity.MESSAGE_READ:
                 int type = msg.arg2;
-                if (type == BluetoothConnectivity.TYPE_START && mTetrisNotStarted) {
+                if (type == BluetoothConnectivity.TYPE_START) {// && mTetrisNotStarted) {
                 	me.mStatusDialog.dismiss();
                 	Log.i(MainMenu.TAG, "BT Received: Host started a game");
-                	mTetrisNotStarted = false;
+                	//mTetrisNotStarted = false;
                 	Intent intt = new Intent(me, TetriBlastActivity.class);
                 	startActivityForResult(intt, REQUEST_JOIN_THE_GAME);
                 }
@@ -102,7 +103,7 @@ public class ConnectionActivity extends Activity {
         Log.d(TAG, "Connection Activity Created");
         Button hostBtn = (Button)findViewById(R.id.btn_host);
         Button joinBtn = (Button)findViewById(R.id.btn_join);
-        mTetrisNotStarted = true;        
+        //mTetrisNotStarted = true;        
         hostBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -198,7 +199,7 @@ public class ConnectionActivity extends Activity {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "Connection Activity Started");
-        mTetrisNotStarted = true;
+        //mTetrisNotStarted = true;
         // If BT is disabled, start enable request.
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
