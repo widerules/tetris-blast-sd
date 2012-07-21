@@ -217,7 +217,7 @@ public class BluetoothConnectivity {
         }
         byte[] out;
         if (data != null){
-        	out = new byte[data.length + 1];
+        	out = new byte[data.length + 2];
         	out[0] = (byte)type;
         	for(int i = 0; i < data.length; i++)
         		out[i+1] = data[i];
@@ -225,14 +225,16 @@ public class BluetoothConnectivity {
         else {
         	out = new byte[1];
         	out[0] = (byte)type;
-        	r.write(out);
+        	//r.write(out);
         }
-        try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+// TODO remove this block
+//        try {
+//			Thread.sleep(50);
+//		} catch (InterruptedException e) {
+//			
+//			e.printStackTrace();
+//		}
+//********************************//
         r.write(out);// Perform the write unsynchronized
     }
     
