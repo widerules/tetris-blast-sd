@@ -17,6 +17,7 @@ import android.util.Log;
 
 public class BluetoothConnectivity {
 	private static final String TAG = MainMenu.TAG;
+	public static final String DELIMITER = "#";//Possible to change to any string length;
 	// Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
@@ -34,10 +35,11 @@ public class BluetoothConnectivity {
     private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     // Name for the SDP record when creating server socket
     private static final String NAME = "BluetoothTetris";
-    
+        
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
+    
     
     // Bluetooth messages types
     public static final int TYPE_LINES = 1;
@@ -216,25 +218,22 @@ public class BluetoothConnectivity {
             r = mConnectedThread;
         }
         byte[] out;
+        byte[] endTile;
+        String endOfMsg = DELIMITER;
+        endTile = endOfMsg.getBytes();//End of message
         if (data != null){
-        	out = new byte[data.length + 2];
+        	out = new byte[data.length + 1 + endTile.length];
         	out[0] = (byte)type;
-        	for(int i = 0; i < data.length; i++)
-        		out[i+1] = data[i];
+        	System.arraycopy(data, 0, out, 1, data.length);
+        	//add end of message to out array
+        	System.arraycopy(endTile, 0, out, 1+data.length, endTile.length);
         }
         else {
-        	out = new byte[1];
+        	out = new byte[1 + endTile.length];
         	out[0] = (byte)type;
-        	//r.write(out);
+        	System.arraycopy(endTile, 0, out, 1, endTile.length);
         }
-// TODO remove this block
-//        try {
-//			Thread.sleep(50);
-//		} catch (InterruptedException e) {
-//			
-//			e.printStackTrace();
-//		}
-//********************************//
+        
         r.write(out);// Perform the write unsynchronized
     }
     
@@ -419,7 +418,7 @@ public class BluetoothConnectivity {
             byte[] buffer = new byte[1024];
             int bytes;
             byte[] dataBuff;
-
+            byte[][] bytesSplited;
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
@@ -427,15 +426,17 @@ public class BluetoothConnectivity {
                     bytes = mmInStream.read(buffer);
                     
                     if (bytes > 0) {
-                    	//Log.i(MainMenu.TAG, "Bytes received: " + bytes);
-                    	dataBuff = new byte[bytes-1];
-                    	for (int i = 0; i < dataBuff.length; i++)
-                    		dataBuff[i] = buffer[i+1];//copy only data without first type byte
-                    
-                    	// Send the obtained bytes to the UI Activity
-                    	// arg1 - data length, arg2 type, msg Object data array
-                    	mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, dataBuff.length, (int)buffer[0], dataBuff)
-                    	.sendToTarget();
+                    	bytesSplited = byteSplit(buffer, DELIMITER);//split byte array by deliiter
+                    	
+                    	for(int j = 0; j < bytesSplited.length; j++){
+                    		dataBuff = new byte[bytesSplited[j].length-1];
+                    		//copy only data without first type byte
+                    		System.arraycopy(bytesSplited[j], 1, dataBuff, 0, dataBuff.length);
+                    		// Send the obtained bytes to the UI Activity
+                    		// arg1 - data length, arg2 type, msg Object data array
+                    		mHandler.obtainMessage(BluetoothConnectivity.MESSAGE_READ, dataBuff.length, (int)bytesSplited[j][0], dataBuff)
+                    		.sendToTarget();
+                    	}
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
@@ -468,5 +469,21 @@ public class BluetoothConnectivity {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
         }
+        
+        
+    }
+    
+    /*
+     * This method split byte array by the argument delimiter provided
+     * using String.split method 
+     */
+    protected byte[][] byteSplit(byte[] toSplit, String delimiter) {
+    	byte[][] splited;
+    	String[] result = new String(toSplit).split(delimiter);
+    	splited = new byte[result.length][];
+    	for(int i = 0; i < result.length; i++){
+    		splited[i] = result[i].getBytes();
+    	}
+    	return splited;
     }
 }
