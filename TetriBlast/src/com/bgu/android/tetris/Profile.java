@@ -32,6 +32,9 @@ public class Profile {
 	public static final String DIFFICULTY = "difficulty";
 	public static final String SCORE = "score";
 	public static final String SHADOW = "shadow";
+	public static final String SENSATIVITY = "sensativity";
+	public static final String SOUND_EN = "sound_en";
+	public static final String MUSIC_EN = "music_en";
 		
 	//Active profile
 	private String name;
@@ -39,6 +42,9 @@ public class Profile {
 	private long score;
 	private boolean shadow;
 	private int gameMode;
+//	private boolean music_en;
+//	private boolean sound_en;
+	private int mSensativity;
 	
 	private static HashMap<String, String> projectionMap; 
 	static 
