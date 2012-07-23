@@ -9,6 +9,8 @@ public class Settings extends PreferenceActivity{
 	public static final String OPT_MUSIC_ON = "music_on";
 	public static final String OPT_SOUND_ON = "sound_on";
 	public static final String OPT_SENS_LIST = "sens_list";
+	public static final String OPT_PATTERN = "pattern";
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +34,7 @@ public class Settings extends PreferenceActivity{
 	protected void onStop() {
 		super.onStop();
 		SoundManager.getInstance(this).updateMusicEn(getMusicEn(this));
-		SoundManager.getInstance(this).updateSoundEn(getSoundEn(this));
+		SoundManager.getInstance(this).updateSoundEn(getSoundEn(this));		
 	}
 	
 	

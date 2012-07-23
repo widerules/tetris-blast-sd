@@ -2,8 +2,10 @@ package com.bgu.android.tetris;
 
 import java.util.HashMap;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.preference.PreferenceManager;
 
 public class SoundManager {
 	public static final int MAX_STREAMS = 5;
@@ -28,8 +30,9 @@ public class SoundManager {
 	 */
 	private SoundManager(Context context){
 		mContext = context;
-		mSoundEffectsEn = true;//default value
-		mMusicEn = true;
+		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+		mSoundEffectsEn = sharedPrefs.getBoolean(Settings.OPT_SOUND_ON, true);//from settings
+		mMusicEn = sharedPrefs.getBoolean(Settings.OPT_MUSIC_ON, true);
 		mSoundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
 		mSoundPoolMap = new HashMap<Integer, Integer>(); 
 		mAudioManager = (AudioManager)mContext.getSystemService(Context.AUDIO_SERVICE);
