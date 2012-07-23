@@ -3,7 +3,6 @@ package com.bgu.android.tetris;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -12,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -208,8 +208,10 @@ public class TetriBlastActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.d(TAG, "Create main layout");
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mMapView = (MapView)findViewById(R.id.tetris);
-        mMapView.initTilePatern(R.drawable.blocks_patern2);//TODO use from shared settings
+        int id = Integer.parseInt(sharedPrefs.getString(Settings.OPT_PATTERN, "0"));
+        mMapView.initTilePatern(getPatern(id));
         mMainMap = new MainMap(this, mMapView);
         mMainMap.initNewGame();
         mMainMap.setActivityHandler(mHandler);
@@ -275,6 +277,21 @@ public class TetriBlastActivity extends Activity {
         mMapView.setOnTouchListener(mMainMap.mTouchListener);
         //mHandler.sendEmptyMessageDelayed(MSG_MUSIC_BG, 3000);
     }
+
+    private int getPatern(int id) {
+    	int drwId;
+    	switch(id){
+    	case 0:
+    		drwId = R.drawable.blocks_patern2;
+    		break;
+    	case 1:
+    		drwId = R.drawable.blocks_patern;
+    		break;
+    	default:
+    		drwId = R.drawable.blocks_patern2;	
+    	}
+		return drwId;
+	}
 
 //    @Override
 //    protected void onStart() {

@@ -13,8 +13,15 @@
             android:summary="Turn sound effects on"
             android:defaultValue="true"
             />
+         <ListPreference
+            android:defaultValue="0"
+	        android:entries="@array/block_pattern_arr"
+	        android:entryValues="@array/block_pattern_val"
+	        android:key="pattern"
+	        android:summary="Choose blocks pattern"
+	        android:title="Blocks Pattern"/>
     </PreferenceCategory>
-	<PreferenceCategory android:title="Game Settings">
+	<PreferenceCategory android:title="Profile Settings">
 	    <ListPreference
 	        android:defaultValue="0"
 	        android:entries="@array/block_sens_arr"
