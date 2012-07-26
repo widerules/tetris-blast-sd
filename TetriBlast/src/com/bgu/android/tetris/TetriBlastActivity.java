@@ -277,7 +277,9 @@ public class TetriBlastActivity extends Activity {
         mMapView.setOnTouchListener(mMainMap.mTouchListener);
         //mHandler.sendEmptyMessageDelayed(MSG_MUSIC_BG, 3000);
     }
-
+    
+    
+    //mapping pattern ID to drawable ID
     private int getPatern(int id) {
     	int drwId;
     	switch(id){
@@ -286,6 +288,12 @@ public class TetriBlastActivity extends Activity {
     		break;
     	case 1:
     		drwId = R.drawable.blocks_patern;
+    		break;
+    	case 2:
+    		drwId = R.drawable.blocks_patern3;
+    		break;
+    	case 3:
+    		drwId = R.drawable.blocks_patern4;
     		break;
     	default:
     		drwId = R.drawable.blocks_patern2;	
